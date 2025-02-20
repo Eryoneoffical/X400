@@ -5,7 +5,7 @@
 #git pull
 #rm  /home/mks/KlipperScreen  -rf
 #cd  /home/mks/
-#git clone https://gitee.com/xpp123/KlipperScreen.git
+#git clone 
 #echo makerbase | sudo -S service KlipperScreen restart
 
 
