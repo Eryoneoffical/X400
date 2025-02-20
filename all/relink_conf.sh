@@ -39,7 +39,7 @@ cp /home/mks/KlipperScreen/config/timelapse.cfg  /home/mks/moonraker-timelapse/k
 
 #ln -s /home/mks/KlipperScreen/moonraker/moonraker/components/update_manager/update_manager.py  /home/mks/moonraker/moonraker/components/update_manager/update_manager.py
 
-ln -s /home/mks/KlipperScreen/klipper/ /home/mks/klipper
+cp  /home/mks/KlipperScreen/klipper/ /home/mks/  -rf
 ln -s /home/mks/KlipperScreen/all /home/mks/mainsail/all
 cp /home/mks/KlipperScreen/config/runout.cfg  /home/mks/printer_data/config/runout.cfg
 cp /home/mks/KlipperScreen/config/EECAN.cfg  /home/mks/printer_data/config/
