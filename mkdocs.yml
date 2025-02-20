@@ -1,0 +1,74 @@
+site_name: KlipperScreen
+site_url: https://klipperscreen.readthedocs.io
+site_description: >-
+  KlipperScreen documentation.
+
+repo_name: jordanruthe/KlipperScreen/
+repo_url: https://github.com/jordanruthe/KlipperScreen/
+nav:
+    - Home: index.md
+    - Setup:
+      - Hardware.md
+      - Installation.md
+      - Configuration.md
+      - Quicktips.md
+      - Macros: macros.md
+      - Thumbnails.md
+      - Remote screens:
+        - VNC.md
+        - Xserver-XSDL (Android): Android.md
+    - Troubleshooting:
+      - First Steps/Log: Troubleshooting.md
+      - Network: Troubleshooting/Network.md
+      - Physical install: Troubleshooting/Physical_Install.md
+      - Showing Console: Troubleshooting/Showing_console.md
+      - Touch: Troubleshooting/Touch_issues.md
+      - Virtual Console Error: Troubleshooting/VC_ERROR.md
+    - Screenshots: Panels.md
+    - Panels:
+      - Bed Level/Screws: Panels/Screws.md
+      - Job_status/Printing: Panels/Job_status.md
+      - Temperature: Panels/Temperature.md
+      - Z Calibrate: Panels/Zcalibrate.md
+    - Theming.md
+    - Translations.md
+    - Breaking Changes: Changelog.md
+
+    - Contact.md
+theme:
+  name: material
+  language: en
+  features:
+    - content.code.annotate
+    - content.tooltips
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - scheme: slate
+      primary: deep purple
+
+plugins:
+    - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+
+extra:
+    social:
+      - icon: fontawesome/brands/github
+        link: https://github.com/jordanruthe/klipperScreen/
+      - icon: fontawesome/brands/discord
+        link: https://discord.klipper3d.org/
+      - icon: fontawesome/brands/python
