@@ -64,7 +64,7 @@ cp /home/mks/KlipperScreen/moonraker-timelapse/component/timelapse.py /home/mks/
 
 ###
 sync
-chmod 777 /home/mks/KlipperScreen/ * -Rf
+chmod 777 /home/mks/KlipperScreen/* -Rf
 cd /home/mks/KlipperScreen/farm3d
 chmod 777 *
 chmod 777 /home/mks/KlipperScreen/all/*.sh
