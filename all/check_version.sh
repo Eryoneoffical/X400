@@ -25,7 +25,7 @@
 
 #echo $name |sed 's/;/\n/g'  > /home/mks/mainsail/all/printers.txt
 
-newversion=`curl -s https://gitee.com/xpp123/KlipperScreen/raw/master/version.md`
+newversion=`curl -s https://gitee.com/everyone3d/KlipperScreen/raw/master/version.md`
 echo $newversion
 
 local_version=$(cat /home/mks/KlipperScreen/version.md)
