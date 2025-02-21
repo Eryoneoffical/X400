@@ -25,14 +25,15 @@
 
 #echo $name |sed 's/;/\n/g'  > /home/mks/mainsail/all/printers.txt
 
-newversion=`curl -s https://gitee.com/xpp123/KlipperScreen/raw/master/README.md`
+newversion=`curl -s https://gitee.com/xpp123/KlipperScreen/raw/master/version.md`
 echo $newversion
 
-local_version=$(cat /home/mks/KlipperScreen/README.md)
+local_version=$(cat /home/mks/KlipperScreen/version.md)
 echo $local_version
 
-ver_string="X400"
 
+ver_string="X400"
+#to see if it contain the 'X400' else timeout
 if [[ $newversion =~ $ver_string ]]
 then
     echo "connected"

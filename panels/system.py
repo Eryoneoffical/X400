@@ -140,7 +140,7 @@ class Panel(ScreenPanel):
 
     def get_updates(self, refresh="false"):
 
-        out = subprocess.run(['cat', "/home/mks/KlipperScreen/README.md"],
+        out = subprocess.run(['cat', "/home/mks/KlipperScreen/version.md"],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              universal_newlines=True  # Python >= 3.7 also accepts "text=True"
