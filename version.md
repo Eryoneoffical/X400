@@ -1,1 +1,1 @@
-# Klipper and screen for Eryone Thinker X400 V1.129.1
+# Klipper and screen for Eryone Thinker X400 V1.129.2
