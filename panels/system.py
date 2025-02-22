@@ -12,7 +12,7 @@ from ks_includes.screen_panel import ScreenPanel
 # Same as ALLOWED_SERVICES in moonraker
 # https://github.com/Arksine/moonraker/blob/master/moonraker/components/machine.py
 ALLOWED_SERVICES = (
-    "Eryone_App",
+    #"Eryone_App",
     #"MoonCord",
     #"moonraker",
     #"moonraker-telegram-bot",
@@ -107,7 +107,7 @@ class Panel(ScreenPanel):
             labels_image.set_from_pixbuf(pixbuf)
             infogrid.attach(labels_image, 0, 1, 1, 1)
        # infogrid.attach(self.labels["MAC"], 0, 1, 1, 1)
-        infogrid.attach(self.labels["Eryone_App"], 1, 2, 1, 1)
+       # infogrid.attach(self.labels["Eryone_App"], 1, 2, 1, 1)
         infogrid.attach(self.labels["ipmac"],      1, 1, 1, 1)
         self.labels["MAC"].get_style_context().add_class('updater-item')
         self.labels["ipmac"].get_style_context().add_class('updater-item')
