@@ -62,6 +62,8 @@ rm /home/mks/printer_data/config/timelapse.cfg
 ln -s /home/mks/moonraker-timelapse/klipper_macro/timelapse.cfg  /home/mks/printer_data/config/timelapse.cfg
 cp /home/mks/KlipperScreen/moonraker-timelapse/component/timelapse.py /home/mks/moonraker/moonraker/components/
 
+rm /home/mks/printer_data/config/moonraker.conf
+cp  /home/mks/KlipperScreen/config/moonraker.conf  /home/mks/printer_data/config
 ###
 sync
 chmod 777 /home/mks/KlipperScreen/* -Rf
