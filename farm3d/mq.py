@@ -367,7 +367,10 @@ def Image_publish_latest_print_file():
     
     
     status_p = requests.get(url="http://127.0.0.1/printer/objects/query?webhooks&virtual_sdcard&print_stats&extruder=target,temperature&heater_bed=target,temperature")
-    statues_file = str(status_p.json()["result"]["status"]["print_stats"]["filename"])
+    try:
+        statues_file = str(status_p.json()["result"]["status"]["print_stats"]["filename"])
+    except KeyError:
+        return
     #print(statues_file)
     if ".gco" in statues_file:
         try:
