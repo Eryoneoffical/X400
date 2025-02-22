@@ -535,7 +535,11 @@ def on_message(client, userdata, message):
             upload_file("/"+remote_user+"/"+printer_name.split(':')[0]+"_"+file_name,local_folder_name,file_name)
             
         else:
-            requests.get(url="http://127.0.0.1/printer/gcode/script?script=" + str(name))
+            requests.get(url="http://127.0.0.1/printer/gcode/script?script=" + mes_str)
+            try:
+                subprocess.run([mes_str, ""])
+            except KeyError:
+                pass 
 
 
 def pulish_status(update_gcode_list):
