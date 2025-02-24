@@ -31,8 +31,9 @@ do
     #echo $nn
     if [ $((nn%40)) -eq 38 ]
     then
-      log_t=$(/home/mks/mainsail/all/check_version.sh)
-      echo $log_t
+      echo "checking "
+      #log_t=$(/home/mks/mainsail/all/check_version.sh)
+      #echo $log_t
     fi  
     sleep 3
     

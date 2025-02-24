@@ -45,6 +45,7 @@ class Panel(ScreenPanel):
         shutdown.connect("clicked", self.reboot_poweroff_update, "update")
         shutdown.set_vexpand(False)
 
+
         scroll = self._gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
@@ -93,9 +94,9 @@ class Panel(ScreenPanel):
 
         self.ipmac = "    Printer Name:   "+printer_name+"\n    Printer Address: "+ni.ifaddresses('eth0')[ni.AF_LINK][0]["addr"]
         self.ipmac = self.ipmac  + "\n\n    Remote control & monitoring:\n    goto 3D Farm https://eryone.club \n    scan the left QR code to add this printer"
-        self.labels["MAC"] = Gtk.Label(label="MAC:")
-        self.labels["MAC"].set_hexpand(True)
-        self.labels["MAC"].set_halign(Gtk.Align.START)
+        self.labels["version"] = Gtk.Label(label="MAC:")
+        self.labels["version"].set_hexpand(True)
+        self.labels["version"].set_halign(Gtk.Align.START)
         self.labels["ipmac"] = Gtk.Label(label= self.ipmac)
         self.labels["ipmac"].set_hexpand(True)
         self.labels["ipmac"].set_halign(Gtk.Align.START)
@@ -106,10 +107,10 @@ class Panel(ScreenPanel):
         if pixbuf is not None:
             labels_image.set_from_pixbuf(pixbuf)
             infogrid.attach(labels_image, 0, 1, 1, 1)
-       # infogrid.attach(self.labels["MAC"], 0, 1, 1, 1)
+        infogrid.attach(self.labels["version"], 1, 2, 2, 1)
        # infogrid.attach(self.labels["Eryone_App"], 1, 2, 1, 1)
-        infogrid.attach(self.labels["ipmac"],      1, 1, 1, 1)
-        self.labels["MAC"].get_style_context().add_class('updater-item')
+        infogrid.attach(self.labels["ipmac"], 1, 1, 1, 1)
+        self.labels["version"].get_style_context().add_class('updater-item')
         self.labels["ipmac"].get_style_context().add_class('updater-item')
 
 
@@ -143,11 +144,27 @@ class Panel(ScreenPanel):
         out = subprocess.run(['cat', "/home/mks/KlipperScreen/version.md"],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
-                             universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                             universal_newlines=True
                              )
         version = str(out.stdout)
-        start_l = version.find("Eryone")
-        self.labels["ipmac"].set_label( "    "+version[start_l:] +"\n\n" + self.ipmac )
+        start_l = version.find("X400 ")
+        out = subprocess.run(['curl','-s', "https://gitee.com/everyone3d/KlipperScreen/raw/master/version.md"],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             universal_newlines=True
+                             )
+        remote_version = str(out.stdout)
+        start_l_r = remote_version.find("X400 ")
+        if start_l != start_l_r:
+            self.labels["version"].set_label(
+                "    Printer Version:" + version[start_l + 5:] + "\n    New  available:" + remote_version[start_l_r + 5:])
+        else:
+            self.labels["version"].set_label(
+                "    Version:" + version[start_l + 5:] + "\n")
+        #remote_version[start_l_r:]
+        #self.labels['MAC'].get_style_context().add_class("printing-status_message")
+
+        self.labels["ipmac"].set_label( self.ipmac )
       #  self.labels[self.text_str].set_label("    This is already the latest Version:\n\n    " + version[start_l:])
         return
         update_resp = self._screen.apiclient.send_request(f"machine/update/status?refresh={refresh}")
