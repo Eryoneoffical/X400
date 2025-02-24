@@ -155,12 +155,14 @@ class Panel(ScreenPanel):
                              )
         remote_version = str(out.stdout)
         start_l_r = remote_version.find("X400 ")
-        if start_l != start_l_r:
+        if version != remote_version:
+            logging.info(f"start_!=: {version[start_l + 5:]},{remote_version[start_l + 5:]}")
             self.labels["version"].set_label(
                 "    Printer Version:" + version[start_l + 5:] + "\n    New  available:" + remote_version[start_l_r + 5:])
         else:
+            logging.info(f"start_==: {version[start_l + 5:]},{remote_version[start_l + 5:]}")
             self.labels["version"].set_label(
-                "    Version:" + version[start_l + 5:] + "\n")
+                "    Version:" + version[start_l + 5:] + "\n   \n")
         #remote_version[start_l_r:]
         #self.labels['MAC'].get_style_context().add_class("printing-status_message")
 
