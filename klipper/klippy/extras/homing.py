@@ -70,14 +70,7 @@ class HomingMove:
         # Notify start of homing/probing move
         self.printer.send_event("homing:homing_move_begin", self)
         # Note start location
-        if speed < 15:
-            self.gcode = self.printer.lookup_object('gcode')
-            #self.gcode.respond_info("homing_move")
-            self.gcode.run_script_from_command("resetON")
-            self.toolhead.dwell(0.5)
-            self.gcode.run_script_from_command("resetOFF")
-            self.toolhead.dwell(0.1)
-            self.gcode.run_script_from_command("resetON")
+
         self.toolhead.flush_step_generation()
         kin = self.toolhead.get_kinematics()
         kin_spos = {s.get_name(): s.get_commanded_position()
