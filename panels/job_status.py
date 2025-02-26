@@ -195,7 +195,7 @@ class Panel(ScreenPanel):
                 self.buttons['heater'][dev].connect("clicked", self.menu_item_clicked,
                                                     {"panel": "temperature", "name": _("Temperature"), "extra": dev})
                 self.buttons['heater'][dev].set_halign(Gtk.Align.START)
-                self.labels['temp_grid'].attach(self.buttons['heater'][dev], n, 1, 1, 1)
+                self.labels['temp_grid'].attach(self.buttons['heater'][dev], n, 0, 1, 1)
                 n += 1
         extra_item = not self._show_heater_power
         if self.ks_printer_cfg is not None:
