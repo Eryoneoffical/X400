@@ -32,7 +32,7 @@ rm /home/mks/printer_data/config/mainsail.cfg
 
 rm /home/mks/Bed_D* -rf
 rm /home/mks/printer_data/config/crowsnest.conf
-rm /home/mks/printer_data/config/chamber.conf
+rm /home/mks/printer_data/config/chamber.cfg
 
 cp /home/mks/KlipperScreen/config/timelapse.cfg  /home/mks/moonraker-timelapse/klipper_macro
 
@@ -65,7 +65,7 @@ cp /home/mks/KlipperScreen/moonraker-timelapse/component/timelapse.py /home/mks/
 
 rm /home/mks/printer_data/config/moonraker.conf
 cp  /home/mks/KlipperScreen/config/moonraker.conf  /home/mks/printer_data/config
-cp  /home/mks/KlipperScreen/config/chamber.conf  /home/mks/printer_data/config
+cp  /home/mks/KlipperScreen/config/chamber.cfg  /home/mks/printer_data/config
 ###
 sync
 chmod 777 /home/mks/KlipperScreen/* -Rf
