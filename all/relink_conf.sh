@@ -89,9 +89,9 @@ cd /home/mks/farm3d/
 cp /home/mks/KlipperScreen/farm3d/  /home/mks/  -rf
 chmod 777 /home/mks/farm3d/*
 
-echo makerbase | sudo -S systemctl  stop cloud_mq.service
-echo makerbase | sudo -S systemctl   disable cloud_mq.service
-echo makerbase | sudo -S rm /etc/systemd/system/cloud_mq.service
+#echo makerbase | sudo -S systemctl  stop cloud_mq.service
+#echo makerbase | sudo -S systemctl   disable cloud_mq.service
+#echo makerbase | sudo -S rm /etc/systemd/system/cloud_mq.service
 
 echo makerbase | sudo -S cp /home/mks/farm3d/farm3d.service    /etc/systemd/system/
 echo makerbase | sudo -S systemctl  daemon-reload
