@@ -29,8 +29,8 @@ go to https://eryone.club , then send `Update Software` command in the console p
 1. Download and unzip the img file from the google drive : https://drive.google.com/drive/folders/1htD4KUY9WmH9W7UyBleRF0uzNoNothT1?usp=sharing
 2. Plugin the sdcard into the PC, and flashed it with the balenaEtcher.exe
 3. Plugin the sdcard into the X400 printer,and power on the printer.
-4. Get the ID number of the CAN bus from the printer screen: Memu-->Console-->Sending `W`  (note:not `w` but `W`)
-5. Back to the Menu and click: Firmware Restart, if it failed please restart the printer and run  Memu-->Console-->Sending `W`  again.
+4. Get the CAN UUID numbers from the printer screen: Memu-->Console-->Send `W`  (note:not `w` but `W`)
+5. Back to the Menu and click: Firmware Restart, if it failed please restart the printer and run  Memu-->Console-->Send `W`  again.
 
 ### Software of Farm3D 
 More information: [https://github.com/Eryone/farm3d](https://github.com/Eryone/farm3d)
