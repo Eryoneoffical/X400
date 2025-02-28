@@ -100,5 +100,6 @@ echo makerbase | sudo -S systemctl  restart farm3d.service
 
 sync
 
+echo ' Finished! Please reboot the printer'
 
 exit 0
