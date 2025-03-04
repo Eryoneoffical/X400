@@ -1,12 +1,17 @@
-#!/bin/bash
-str_cfg=$(cat /home/mks/printer_data/config/printer.cfg)
-ver_string="x400.cfg"
-if [[ $str_cfg =~ $ver_string ]]
-then
-    echo "printer.cfg is not null"
-else
-    echo "printer.cfg is null, recoveryng..."
-    cp /home/mks/KlipperScreen/config/printer.cfg /home/mks/printer_data/config/
-    cp /home/mks/KlipperScreen/config/variable.cfg /home/mks/printer_data/config/    
-fi
+#!/bin/sh +e
+
+
+
+cd  /home/mks/KlipperScreen
+rm -f .git/index
+git reset
+git reset --hard origin/master 
+chmod 777 /home/mks/KlipperScreen/* -Rf
+chmod 777 /home/mks/KlipperScreen/all/relink_conf.sh
+/home/mks/KlipperScreen/all/relink_conf.sh
+#/home/mks/KlipperScreen/all/install_lib.sh
+sync
+
+
+
 exit 0

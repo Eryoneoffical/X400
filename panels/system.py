@@ -34,16 +34,17 @@ class Panel(ScreenPanel):
         update_all = self._gtk.Button('arrow-up', _('Full Update'), 'color1')
         update_all.connect("clicked", self.show_update_info, "full")
         update_all.set_vexpand(False)
-        self.refresh = self._gtk.Button('refresh', _('Refresh'), 'color2')
+        self.refresh = self._gtk.Button('refresh', _('Recovery'), 'color2')
         self.refresh.connect("clicked", self.refresh_updates)
         self.refresh.set_vexpand(False)
 
        # reboot = self._gtk.Button('refresh', _('Restart'), 'color3')
        # reboot.connect("clicked", self.reboot_poweroff, "reboot")
        # reboot.set_vexpand(False)
-        shutdown = self._gtk.Button('arrow-up', _('Update'), 'color4')
-        shutdown.connect("clicked", self.reboot_poweroff_update, "update")
-        shutdown.set_vexpand(False)
+        self.upgrade = self._gtk.Button('arrow-up', _('Update'), 'color4')
+        self.upgrade.connect("clicked", self.reboot_poweroff_update, "update")
+        self.upgrade.set_vexpand(False)
+        self.upgrade.set_sensitive(False)
 
 
         scroll = self._gtk.ScrolledWindow()
@@ -103,7 +104,7 @@ class Panel(ScreenPanel):
 
 
         labels_image = self._screen.gtk.Image()
-        pixbuf = self._screen.gtk.PixbufFromFile("/tmp/qrcode.png", 270, 270)
+        pixbuf = self._screen.gtk.PixbufFromFile("/tmp/qrcode.png", 260, 260)
         if pixbuf is not None:
             labels_image.set_from_pixbuf(pixbuf)
             infogrid.attach(labels_image, 0, 1, 1, 1)
@@ -119,9 +120,9 @@ class Panel(ScreenPanel):
 
         grid.attach(scroll, 0, 0, 3, 2)
        # grid.attach(update_all, 1, 2, 1, 1)
-        #grid.attach(self.refresh, 1, 2, 1, 1)
+        grid.attach(self.refresh, 1, 2, 1, 1)
         #grid.attach(reboot, 1, 2, 1, 1)
-        grid.attach(shutdown, 2, 2, 1, 1)
+        grid.attach(self.upgrade, 2, 2, 1, 1)
 
     #scroll.add(vbox)
         self.content.add(grid)
@@ -137,7 +138,8 @@ class Panel(ScreenPanel):
         #subprocess.run(["/home/mks/KlipperScreen/all/get_canuid.sh", ""])
         self.refresh.set_sensitive(False)
         self._screen.show_popup_message(_("Checking for updates, please wait..."), level=1)
-        GLib.timeout_add_seconds(1, self.get_updates, "true")
+        GLib.timeout_add_seconds(1, subprocess.run(["/home/mks/mainsail/all/git_pull.sh", "&"]), "true")
+
 
     def get_updates(self, refresh="false"):
 
@@ -148,6 +150,7 @@ class Panel(ScreenPanel):
                              )
         version = str(out.stdout)
         start_l = version.find("X400 ")
+        local_v=version[start_l + 5:].replace("\n", "")
         out = subprocess.run(['curl','-s', "https://gitee.com/everyone3d/KlipperScreen/raw/master/version.md"],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
@@ -155,14 +158,17 @@ class Panel(ScreenPanel):
                              )
         remote_version = str(out.stdout)
         start_l_r = remote_version.find("X400 ")
-        if version != remote_version:
-            logging.info(f"start_!=: {version[start_l + 5:]},{remote_version[start_l + 5:]}")
+        remote_v=remote_version[start_l_r + 5:].replace("\n", "")
+        if local_v != remote_v and start_l_r > 0:
+            logging.info(f"start_!=: {local_v},{remote_v}")
             self.labels["version"].set_label(
-                "    Printer Version:" + version[start_l + 5:] + "\n    New  available:" + remote_version[start_l_r + 5:])
+                "    Printer Version:" + local_v + "\n    New  available:" + remote_v)
+            self.upgrade.set_sensitive(True)
         else:
-            logging.info(f"start_==: {version[start_l + 5:]},{remote_version[start_l + 5:]}")
+            logging.info(f"start_==: {local_v},{remote_v}")
             self.labels["version"].set_label(
-                "    Version:" + version[start_l + 5:] + "\n   \n")
+                "    Version:" + local_v + "\n   \n")
+            self.upgrade.set_sensitive(False)
         #remote_version[start_l_r:]
         #self.labels['MAC'].get_style_context().add_class("printing-status_message")
 
@@ -457,5 +463,6 @@ class Panel(ScreenPanel):
                 self._screen._ws.send_method("machine.shutdown")
             elif method == "update":
                 self._screen.show_popup_message("Waiting,this update may take about 5 to 10 minutes", 1, 10)
+               # GLib.timeout_add_seconds(1, self.get_updates, "true")
                 subprocess.run(["/home/mks/mainsail/all/git_pull.sh", "&"])
 

@@ -56,12 +56,7 @@ cp /home/mks/KlipperScreen/config/mainsail.cfg  /home/mks/printer_data/config/
 #sed -i 's/z_offset/z_offset = -0.12 #/g' /home/mks/printer_data/config/printer.cfg
 
 ###
-cp /home/mks/KlipperScreen/all/timelapse_install.sh  /home/mks/moonraker-timelapse/scripts/install.sh
-cd  /home/mks/moonraker-timelapse/
-make install
-rm /home/mks/printer_data/config/timelapse.cfg
-ln -s /home/mks/moonraker-timelapse/klipper_macro/timelapse.cfg  /home/mks/printer_data/config/timelapse.cfg
-cp /home/mks/KlipperScreen/moonraker-timelapse/component/timelapse.py /home/mks/moonraker/moonraker/components/
+
 
 rm /home/mks/printer_data/config/moonraker.conf
 cp  /home/mks/KlipperScreen/config/moonraker.conf  /home/mks/printer_data/config
@@ -69,12 +64,7 @@ cp  /home/mks/KlipperScreen/config/chamber.cfg  /home/mks/printer_data/config
 ###
 sync
 chmod 777 /home/mks/KlipperScreen/* -Rf
-cd /home/mks/KlipperScreen/farm3d
-chmod 777 *
 chmod 777 /home/mks/KlipperScreen/all/*.sh
-./install.sh 
-pip3 install opencv-python
-pip3 install qrcode[pil]
 
 curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=needreboot%20VALUE=1
 #curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=use_ai%20VALUE=1
@@ -84,14 +74,11 @@ curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIAB
 echo makerbase | sudo -S systemctl disable moonraker-obico.service
 
 
-cd /home/mks/farm3d/
-#git fetch --all &&  git reset --hard && git pull
 cp /home/mks/KlipperScreen/farm3d/  /home/mks/  -rf
 chmod 777 /home/mks/farm3d/*
+cd /home/mks/KlipperScreen/farm3d
+chmod 777 *
 
-#echo makerbase | sudo -S systemctl  stop cloud_mq.service
-#echo makerbase | sudo -S systemctl   disable cloud_mq.service
-#echo makerbase | sudo -S rm /etc/systemd/system/cloud_mq.service
 
 echo makerbase | sudo -S cp /home/mks/farm3d/farm3d.service    /etc/systemd/system/
 echo makerbase | sudo -S systemctl  daemon-reload
