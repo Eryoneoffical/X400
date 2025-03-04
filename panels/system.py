@@ -35,7 +35,7 @@ class Panel(ScreenPanel):
         update_all.connect("clicked", self.show_update_info, "full")
         update_all.set_vexpand(False)
         self.refresh = self._gtk.Button('refresh', _('Recovery'), 'color2')
-        self.refresh.connect("clicked", self.refresh_updates)
+        self.refresh.connect("clicked", self.reboot_poweroff_update,"recovery")
         self.refresh.set_vexpand(False)
 
        # reboot = self._gtk.Button('refresh', _('Restart'), 'color3')
@@ -136,9 +136,10 @@ class Panel(ScreenPanel):
     def refresh_updates(self, widget=None):
         self.get_updates()
         #subprocess.run(["/home/mks/KlipperScreen/all/get_canuid.sh", ""])
+        subprocess.run(["/home/mks/mainsail/all/recovery.sh", "&"])
         self.refresh.set_sensitive(False)
         self._screen.show_popup_message(_("Checking for updates, please wait..."), level=1)
-        GLib.timeout_add_seconds(1, subprocess.run(["/home/mks/mainsail/all/git_pull.sh", "&"]), "true")
+        GLib.timeout_add_seconds(1, subprocess.run(["/home/mks/mainsail/all/recovery.sh", "&"]), "true")
 
 
     def get_updates(self, refresh="false"):
@@ -431,6 +432,8 @@ class Panel(ScreenPanel):
             label = Gtk.Label(label=_("Are you sure you wish to shutdown the system?"))
         elif method == "update":
             label = Gtk.Label(label=_("Perform a full upgrade? this update may take about 5 to 10 minutes"))
+        elif method == "recovery":
+            label = Gtk.Label(label=_("Recovery to factoring setting? this update may take about 1 minutes"))
 
         vbox.add(label)
         scroll.add(vbox)
@@ -465,4 +468,5 @@ class Panel(ScreenPanel):
                 self._screen.show_popup_message("Waiting,this update may take about 5 to 10 minutes", 1, 10)
                # GLib.timeout_add_seconds(1, self.get_updates, "true")
                 subprocess.run(["/home/mks/mainsail/all/git_pull.sh", "&"])
-
+            elif method == "recovery":
+                subprocess.run(["/home/mks/mainsail/all/recovery.sh", "&"])
