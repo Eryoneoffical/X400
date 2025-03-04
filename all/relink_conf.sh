@@ -62,7 +62,7 @@ rm /home/mks/printer_data/config/moonraker.conf
 cp  /home/mks/KlipperScreen/config/moonraker.conf  /home/mks/printer_data/config
 cp  /home/mks/KlipperScreen/config/chamber.cfg  /home/mks/printer_data/config
 ###
-sync
+
 chmod 777 /home/mks/KlipperScreen/* -Rf
 chmod 777 /home/mks/KlipperScreen/all/*.sh
 
@@ -85,8 +85,6 @@ echo makerbase | sudo -S systemctl  daemon-reload
 echo makerbase | sudo -S systemctl   enable farm3d.service
 echo makerbase | sudo -S systemctl  restart farm3d.service
 
-sync
 
-echo ' Finished! Please reboot the printer'
 
 exit 0
