@@ -8,9 +8,9 @@ Type=simple
 Restart=always
 RestartSec=1
 User=pi
-WorkingDirectory=~/farm3d/
+WorkingDirectory=/home/mks/farm3d/
 #Environment=""
-ExecStart="~/farm3d/run.sh"
+ExecStart="/home/mks/farm3d/run.sh"
 
 [Install]
 WantedBy=multi-user.target
