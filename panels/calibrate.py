@@ -13,7 +13,8 @@ class Panel(ScreenPanel):
     def __init__(self, screen, title):
         super().__init__(screen, title)
         #self.settings = {}
-
+        self._screen = screen
+        self._gtk = screen.gtk
         self.menu = ['move_menu']
         self.buttons = {
 
@@ -31,67 +32,53 @@ class Panel(ScreenPanel):
                            G28
                            _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
                            G4 P1000
-                           SAVE_CONFIG
-                           M117 ."""}
-        self.buttons['z+'].connect("clicked", self._screen._confirm_send_action,
+                           M117 SHAPER_CALIBRATE calibrate_finish"""}
+        self.buttons['z+'].connect("clicked", self._confirm_send_action,
                                            _("Are you sure to Calibrate?"),
                                            "printer.gcode.script", script)
-        script = {"script": """
-                          ABORT
-                          
-                          M104 S200
-                          M109 S220
-                          QUAD_GANTRY_LEVEL
-                          G28
-                          M109 S200
-                          PROBE_CALIBRATE"""}
-       # self.buttons['z-'].connect("clicked", self._screen._confirm_send_action,
-       #                                    _("Are you sure to Calibrate?"),
-        #                                   "printer.gcode.script", script)
+
         script = {"script": """M119
                        M106 S255
-                       M117 PID_CALIBRATE
+                       M117 PID_CALIBRATE Nozzle
                        G28
                        G1 X200 Y200 Z50
                        PID_CALIBRATE HEATER=extruder TARGET=220
-                       SAVE_CONFIG
-                       M117 .
+                       M117 Extruder PID calibrate_finish
                        M107"""}
-        self.buttons['home'].connect("clicked", self._screen._confirm_send_action,
+        self.buttons['home'].connect("clicked", self._confirm_send_action,
                                            _("Are you sure to Calibrate?"),
                                            "printer.gcode.script", script)
         script = {"script": """M104 S150
                                 M117 QUAD_GANTRY_LEVEL
                                 G28 
-                                _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
-                                M117 ."""}
-        self.buttons['motors_off'].connect("clicked", self._screen._confirm_send_action,
+                                _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5                             
+                                M117 QGL calibrate_finish"""}
+        self.buttons['motors_off'].connect("clicked", self._confirm_send_action,
                                            _("Are you sure to Calibrate?"),
                                            "printer.gcode.script", script)
         script = {"script": """
                                   ABORT
-                                  M117 PID_CALIBRATE
-                                  G28 
-                                  M117 PID_CALIBRATE
+                                  M117 PID_CALIBRATE in progress
+                                  G28  
                                   G1 X200 Y200 Z50 
                                   M119
                                   M106 S255
                                   PID_CALIBRATE HEATER=extruder TARGET=220
                                   PID_CALIBRATE HEATER=heater_bed TARGET=60
                                   M106 S255
-                                  M117 SHAPER_CALIBRATE
+                                  M117 SHAPER CALIBRATE in progress
                                   SHAPER_CALIBRATE
                                   M107
                                   M104 S150
                                   G28
-                                  M117 QUAD_GANTRY_LEVEL
+                                  M117 QUAD_GANTRY_LEVEL in progress
+                                  G28
                                   _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
                                   G4 P1000
-                                  M117 .
                                   SAVE_VARIABLE VARIABLE=allcalibrate VALUE=0
-                                  SAVE_CONFIG
+                                  M117 ALL calibrate_finish
                                   """}
-        self.buttons['ALL'].connect("clicked", self._screen._confirm_send_action,
+        self.buttons['ALL'].connect("clicked", self._confirm_send_action,
                                            _("Are you sure to Calibrate?"),
                                            "printer.gcode.script", script)
 
@@ -102,9 +89,9 @@ class Panel(ScreenPanel):
                                G1 X200 Y200 Z50
                                PID_CALIBRATE HEATER=heater_bed TARGET=60
                                SAVE_CONFIG
-                               M117 .
+                               M117 Bed PID calibrate finish
                                M107"""}
-        self.buttons['bed_pid'].connect("clicked", self._screen._confirm_send_action,
+        self.buttons['bed_pid'].connect("clicked", self._confirm_send_action,
                                      _("Are you sure to Calibrate?"),
                                      "printer.gcode.script", script)
 
@@ -121,11 +108,12 @@ class Panel(ScreenPanel):
 
         for p in ('pos_x', 'pos_y', 'pos_z'):
             self.labels[p] = Gtk.Label()
+            self.labels[p].get_style_context().add_class("printing-status_message")
         self.labels['move_dist'] = Gtk.Label(_("Move Distance (mm)"))
 
         bottomgrid = self._gtk.HomogeneousGrid()
         bottomgrid.set_direction(Gtk.TextDirection.LTR)
-        bottomgrid.attach(self.labels['pos_z'], 2, 2, 1, 1)
+        bottomgrid.attach(self.labels['pos_z'], 2, 1, 1, 1)
         self.labels['move_menu'] = self._gtk.HomogeneousGrid()
         self.labels['move_menu'].attach(grid, 0, 0, 1, 3)
         self.labels['move_menu'].attach(bottomgrid, 0, 3, 1, 1)
@@ -170,15 +158,24 @@ class Panel(ScreenPanel):
         #logging.info(f"### data {data}, action {action}")
 
         if action == "notify_status_update":
-            logging.info(f"### data {data}, action {action}")
+           #logging.info(f"### data {data}, action {action}")
             if "display_status" in data and "message" in data["display_status"] and data['display_status'] is not None:
-                self.labels['pos_z'].set_label(
-                    f"{data['display_status']['message'] if data['display_status']['message'] is not None else ''}"
-                )
-                if "SAVE_CONFIG_REBOOT" in data :
-                    script = {"script": "SAVE_CONFIG"}
+                logging.info(f"### data {data['display_status']['message']}")
+                lcd_msg = ""
+                if data['display_status']['message'] is not None:
+                    lcd_msg = str(data['display_status']['message'])
+                    lcd_msg = lcd_msg.replace("\\n", "\n")
+                    logging.info(lcd_msg)
+                self.labels['pos_z'].set_label(lcd_msg)
+
+                if "calibrate_finish" in lcd_msg:
+                    #self._screen.base_panel.action_bar.
+                    #self._screen.base_panel.action_bar.show()
+                    self._screen.base_panel.action_bar.set_sensitive(True)
+                    script = {"script": "M117 ."}
                     self._screen._send_action(None, "printer.gcode.script", script)
-                    return
+                    script = {"script": "Save_config"}
+                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?", "printer.gcode.script", script)
 
         if action == "notify_busy":
             self.process_busy(data)
@@ -206,9 +203,9 @@ class Panel(ScreenPanel):
                     self.labels['pos_y'].set_text(f"Y: {data['gcode_move']['gcode_position'][1]:.2f}")
             else:
                 self.labels['pos_y'].set_text("Y: ?")
-            if "z" in homed_axes:
-                if "gcode_move" in data and "gcode_position" in data["gcode_move"]:
-                    self.labels['pos_z'].set_text(f"Z: {data['gcode_move']['gcode_position'][2]:.2f}")
+          #  if "z" in homed_axes:
+          #      if "gcode_move" in data and "gcode_position" in data["gcode_move"]:
+            #        self.labels['pos_z'].set_text(f"Z: {data['gcode_move']['gcode_position'][2]:.2f}")
             #else:
            #     self.labels['pos_z'].set_text("Z: ?")
 
@@ -299,3 +296,34 @@ class Panel(ScreenPanel):
         menuitems = self._screen._config.get_menu_items("move", name)
         self._screen.show_popup_message(f"Make sure nothing is on the BED! ",1)
         self._screen.show_panel("menu", disname, items=menuitems)
+
+
+    def _confirm_send_action(self, widget, text, method, params=None):
+        buttons = [
+            {"name": _("Continue"), "response": Gtk.ResponseType.OK},
+            {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
+        ]
+
+       # label = Gtk.Label(text)
+        label = Gtk.Label()
+        label.set_markup(text)
+        label.set_hexpand(True)
+        label.set_halign(Gtk.Align.CENTER)
+        label.set_vexpand(True)
+        label.set_valign(Gtk.Align.CENTER)
+        label.set_line_wrap(True)
+        label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+
+        self.confirm = self._gtk.Dialog(self._screen, buttons, label, self._confirm_send_action_response, method, params)
+       # dialog =       self._gtk.Dialog(self._screen, buttons, scroll, self.reboot_poweroff_update_confirm, method)
+        self.confirm.set_title("KlipperScreen")
+
+    def _confirm_send_action_response(self, dialog, response_id, method, params):
+        self._gtk.remove_dialog(dialog)
+        if response_id == Gtk.ResponseType.OK:
+            self._screen._send_action(None, method, params)
+            self._screen.base_panel.action_bar.set_sensitive(False)
+            #script = {"script": "save_config"}
+            #self._confirm_send_action(self._screen, "save config?", "printer.gcode.script", script)
+
+
