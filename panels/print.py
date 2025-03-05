@@ -605,14 +605,14 @@ class Panel(ScreenPanel):
         GLib.idle_add(self.image_load, filename)
 
     def _callback(self, newfiles, deletedfiles, updatedfiles=None):
-        logging.debug(f"newfiles: {newfiles}")
+        #logging.debug(f"newfiles: {newfiles}")
         for file in newfiles:
             self.add_file(file)
-        logging.debug(f"deletedfiles: {deletedfiles}")
+        #logging.debug(f"deletedfiles: {deletedfiles}")
         for file in deletedfiles:
             self.delete_file(file)
         if updatedfiles is not None:
-            logging.debug(f"updatefiles: {updatedfiles}")
+           # logging.debug(f"updatefiles: {updatedfiles}")
             for file in updatedfiles:
                 self.update_file(file)
         return False
