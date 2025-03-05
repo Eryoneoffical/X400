@@ -174,7 +174,7 @@ class Panel(ScreenPanel):
                     self._screen.base_panel.action_bar.set_sensitive(True)
                     script = {"script": "M117 ."}
                     self._screen._send_action(None, "printer.gcode.script", script)
-                    script = {"script": "Save_config"}
+                    script = {"script": "save_config"}
                     self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?", "printer.gcode.script", script)
 
         if action == "notify_busy":
@@ -322,7 +322,9 @@ class Panel(ScreenPanel):
         self._gtk.remove_dialog(dialog)
         if response_id == Gtk.ResponseType.OK:
             self._screen._send_action(None, method, params)
-            self._screen.base_panel.action_bar.set_sensitive(False)
+            logging.info(str(params["script"]))
+            if "save_config" not in str(params["script"]):
+                self._screen.base_panel.action_bar.set_sensitive(False)
             #script = {"script": "save_config"}
             #self._confirm_send_action(self._screen, "save config?", "printer.gcode.script", script)
 
