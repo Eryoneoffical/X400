@@ -176,6 +176,7 @@ all_notify =''
 down_size = 0
 total_size = 0
 name_down_file =''
+exit_flag = 0
 
 notify_flag = 1
 
@@ -444,7 +445,7 @@ def on_message(client, userdata, message):
     global down_size
     global total_size
     global name_down_file
-    
+    global exit_flag
     
     logging.info(f"{message.topic},{json.loads(str(message.payload.decode('utf-8')))['name']}")
 
@@ -515,13 +516,13 @@ def on_message(client, userdata, message):
         elif 'update_eryone_app' in mes_str:
             try:
                 subprocess.run(["/home/mks/KlipperScreen/all/git_pull.sh", ""])
-            except KeyError:
-                pass    
+            except:
+                exit_flag = 1     
         elif 'update_farm3d_app' in mes_str:        
             try:
                 subprocess.run(["./update.sh", ""])
-            except KeyError:
-                pass            
+            except:
+                exit_flag = 1             
                 
         elif 'POST /' in mes_str:
             command = "http://127.0.0.1" + str(name).replace("POST ", "").replace("\n","")
@@ -536,13 +537,17 @@ def on_message(client, userdata, message):
             remote_user = str(name).split(":")[1]
             #local_file =  str(name).replace("upload_file_to_cloud:", "").replace("\n","") #"/home/mks/printer_data/logs/klippy.log"
             upload_file("/"+remote_user+"/"+printer_name.split(':')[0]+"_"+file_name,local_folder_name,file_name)
-            
+        elif 'SHELL /' in mes_str:
+            try:
+                print(mes_str[len('SHELL /'):].replace("\n",'').split(" "))
+                subprocess.run(mes_str[len('SHELL /'):].replace("\n",'').split(" "))
+                
+            except Exception as e:
+                print(e)
+                exit_flag = 1 
         else:
             requests.get(url="http://127.0.0.1/printer/gcode/script?script=" + mes_str)
-            try:
-                subprocess.run([mes_str, ""])
-            except KeyError:
-                pass 
+             
 
 
 def pulish_status(update_gcode_list):
@@ -630,10 +635,11 @@ while True:
         time.sleep(2)
     else:
         time.sleep(3)
-    if connect_problem == 1:
+    if connect_problem == 1 or exit_flag == 1:
+        logging.info("go to exit")
         exit()
     pulish_status(0)
-  
+
     
     if (time.time() - time_old)>30 and (wakeup==1) :
         wakeup = 0
