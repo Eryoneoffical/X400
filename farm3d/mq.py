@@ -583,6 +583,20 @@ def pulish_status(update_gcode_list):
             q_list_file = requests.get(url="http://127.0.0.1/server/files/list?root=timelapse")
             if "result" in q_list_file.json():
                 value_json["timelapse_list"] = q_list_file.json()["result"]
+            try:
+                out = subprocess.run(['cat', "/home/mks/KlipperScreen/version.md"],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             universal_newlines=True
+                             )
+                version = str(out.stdout)
+                value_json["printer_version"] = version
+                print(version)
+            except:
+                exit_flag = 1
+                print("error:version read")
+                logging.info("exit_flag = 1, read version error")
+        
             value_json["console_log"] =  all_notify
             update_gcode_list = 0
             
