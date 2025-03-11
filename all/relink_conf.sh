@@ -35,7 +35,8 @@ rm /home/mks/printer_data/config/crowsnest.conf
 rm /home/mks/printer_data/config/chamber.cfg
 
 cp /home/mks/KlipperScreen/config/timelapse.cfg  /home/mks/moonraker-timelapse/klipper_macro
-
+cp /home/mks/KlipperScreen/config/v1_1.cfg  /home/mks/printer_data/config/
+cp /home/mks/KlipperScreen/config/v1_2.cfg  /home/mks/printer_data/config/
 #rm /home/mks/moonraker/moonraker/components/update_manager/update_manager.py
 
 #ln -s /home/mks/KlipperScreen/moonraker/moonraker/components/update_manager/update_manager.py  /home/mks/moonraker/moonraker/components/update_manager/update_manager.py
@@ -65,7 +66,7 @@ cp  /home/mks/KlipperScreen/config/chamber.cfg  /home/mks/printer_data/config
 sync
 chmod 777 /home/mks/KlipperScreen/* -Rf
 chmod 777 /home/mks/KlipperScreen/all/*.sh
-
+/home/mks/KlipperScreen/all/check_hw_version.sh
 curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=needreboot%20VALUE=1
 #curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=use_ai%20VALUE=1
 #curl -X POST http://127.0.0.1/machine/services/restart?service=cloud_mq.service
