@@ -532,9 +532,13 @@ def on_message(client, userdata, message):
             print(command)
             requests.delete(url=command)    
         elif 'upload_file_to_cloud:' in mes_str:
-            local_folder_name =  str(name).split(":")[2] #"/home/mks/printer_data/logs/klippy.log"
-            file_name =  str(name).split(":")[3].replace("\n","")
-            remote_user = str(name).split(":")[1]
+            try:
+                local_folder_name =  str(name).split(":")[2] #"/home/mks/printer_data/logs/klippy.log"
+                file_name =  str(name).split(":")[3].replace("\n","")
+                remote_user = str(name).split(":")[1]
+            except Exception as e:
+                print(e)
+                exit_flag = 1     
             #local_file =  str(name).replace("upload_file_to_cloud:", "").replace("\n","") #"/home/mks/printer_data/logs/klippy.log"
             upload_file("/"+remote_user+"/"+printer_name.split(':')[0]+"_"+file_name,local_folder_name,file_name)
         elif 'SHELL /' in mes_str:
