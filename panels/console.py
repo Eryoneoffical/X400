@@ -176,19 +176,28 @@ class Panel(ScreenPanel):
               )
             self.add_gcode("response", time.time(), out.stdout)
         elif cmd.find("H") == 0:
-            out = subprocess.run(["/home/mks/KlipperScreen/all/change_sensor.sh", cmd],
+            new_cmd='sed -i s/v1_1.cfg/v1_'+cmd[1:2]+'.cfg/g /home/mks/printer_data/config/printer.cfg'
+            out = subprocess.run(new_cmd.split(" "),
               stdout = subprocess.PIPE,
               stderr = subprocess.STDOUT,
               universal_newlines = True # Python >= 3.7 also accepts "text=True"
               )
             self.add_gcode("response", time.time(), out.stdout)
-        elif cmd.find("h") == 0:
-            out = subprocess.run(["/home/mks/KlipperScreen/all/change_sensor_switch.sh", cmd],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
-                                 )
+            new_cmd='sed -i s/v1_2.cfg/v1_'+cmd[1:2]+'.cfg/g /home/mks/printer_data/config/printer.cfg'
+            out = subprocess.run(new_cmd.split(" "),
+              stdout = subprocess.PIPE,
+              stderr = subprocess.STDOUT,
+              universal_newlines = True # Python >= 3.7 also accepts "text=True"
+              )
             self.add_gcode("response", time.time(), out.stdout)
+            new_cmd='sed -i s/v1_3.cfg/v1_'+cmd[1:2]+'.cfg/g /home/mks/printer_data/config/printer.cfg'
+            out = subprocess.run(new_cmd.split(" "),
+              stdout = subprocess.PIPE,
+              stderr = subprocess.STDOUT,
+              universal_newlines = True # Python >= 3.7 also accepts "text=True"
+              )
+            self.add_gcode("response", time.time(), out.stdout)
+
         elif cmd.find("F") == 0:
             out = subprocess.run(['/home/mks/KlipperScreen/all/flash.sh', cmd],
               stdout = subprocess.PIPE,
