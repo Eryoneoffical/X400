@@ -197,6 +197,14 @@ class Panel(ScreenPanel):
               universal_newlines = True # Python >= 3.7 also accepts "text=True"
               )
             self.add_gcode("response", time.time(), out.stdout)
+        elif cmd.find("h") == 0:
+            new_cmd = 'cat /home/mks/printer_data/config/printer.cfg'
+            out = subprocess.run(new_cmd.split(" "),
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                                 )
+            self.add_gcode("response", time.time(), out.stdout[0:220])
 
         elif cmd.find("F") == 0:
             out = subprocess.run(['/home/mks/KlipperScreen/all/flash.sh', cmd],
