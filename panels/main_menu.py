@@ -162,7 +162,7 @@ class Panel(MenuPanel):
                     self.dialog_wait.set_title(_("Update"))
                     return
                 elif 'needreboot = 1' in line:
-                    label = Gtk.Label("Some settings have been changed, and need to reboot the system?")
+                    label = Gtk.Label("The upgrade is complete, Do you want to reboot the printer now?")
                     buttons = [
                         {"name": _("Reboot"), "response": Gtk.ResponseType.OK},
                         {"name": _("Later"), "response": Gtk.ResponseType.CANCEL}

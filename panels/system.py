@@ -92,8 +92,18 @@ class Panel(ScreenPanel):
             file1.close()
         except Exception as e:
             pass
-
-        self.ipmac = "    Printer Name:   "+printer_name+"\n    Printer Address: "+ni.ifaddresses('eth0')[ni.AF_LINK][0]["addr"]
+        out = subprocess.run(['cat', "/home/mks/printer_data/config/printer.cfg"],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             universal_newlines=True
+                             )
+        version = str(out.stdout)
+        hw_version =''
+        try:
+            hw_version="v1_"+version.split("v1_")[1][:2]
+        except Exception as e:
+            pass
+        self.ipmac = "    Printer Name:   "+printer_name+"\n    Printer Address: "+ni.ifaddresses('eth0')[ni.AF_LINK][0]["addr"] +"\n\n    Hardware:"+hw_version
         self.ipmac = self.ipmac  + "\n\n    Remote control & monitoring:\n    goto 3D Farm https://eryone.club \n    scan the left QR code to add this printer"
         self.labels["version"] = Gtk.Label(label="MAC:")
         self.labels["version"].set_hexpand(True)
@@ -163,7 +173,7 @@ class Panel(ScreenPanel):
         if local_v != remote_v and start_l_r > 0:
             logging.info(f"start_!=: {local_v},{remote_v}")
             self.labels["version"].set_label(
-                "    Printer Version:" + local_v + "\n    New  available:" + remote_v)
+                "    Soft Version:" + local_v + "\n    New  available:" + remote_v)
             self.upgrade.set_sensitive(True)
         else:
             logging.info(f"start_==: {local_v},{remote_v}")
