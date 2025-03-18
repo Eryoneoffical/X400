@@ -671,8 +671,10 @@ class Panel(ScreenPanel):
         return True
 
     def update_time_left(self):
+
         total_duration = float(self._printer.get_stat('print_stats', 'total_duration'))
         print_duration = float(self._printer.get_stat('print_stats', 'print_duration'))
+        #logging.debug(f"elapsed:{print_duration},{self.format_time(print_duration)}")
         if 'filament_total' in self.file_metadata and not self.file_metadata['filament_total']:  # No-extrusion
             print_duration = total_duration
         fila_used = float(self._printer.get_stat('print_stats', 'filament_used'))
@@ -698,6 +700,7 @@ class Panel(ScreenPanel):
         with suppress(ZeroDivisionError):
             file_time = (print_duration / progress)
         self.labels["file_time"].set_label(self.format_time(file_time))
+
 
         if timeleft_type == "file":
             estimated = file_time
@@ -727,7 +730,8 @@ class Panel(ScreenPanel):
             elif filament_time is not None and filament_time > 1:
                 estimated = (filament_time + file_time) / 2
             estimated = file_time
-
+        if print_duration < 12*60:# print time seconds
+            estimated = slicer_time
      #   self.labels["est_time"].set_label(self.format_time(estimated))
 
         self.labels["time_left"].set_label(self.format_eta(estimated, print_duration))
