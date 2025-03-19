@@ -37,6 +37,7 @@ class GCodeMove:
         gcode.register_command('GET_POSITION', self.cmd_GET_POSITION, True,
                                desc=self.cmd_GET_POSITION_help)
         self.Coord = gcode.Coord
+        self.stop_heating = 0
         # G-Code coordinate manipulation
         self.absolute_coord = self.absolute_extrude = True
         self.base_position = [0.0, 0.0, 0.0, 0.0]
@@ -140,7 +141,18 @@ class GCodeMove:
         except ValueError as e:
             raise gcmd.error("Unable to parse move '%s'"
                              % (gcmd.get_commandline(),))
-        self.move_with_transform(self.last_position, self.speed)
+                             
+          
+        if self.stop_heating == 0:
+            self.move_with_transform(self.last_position, self.speed)
+        elif 'Z' in params or '240' in params or '200' in params:
+           # gcmd.respond_info("G1_cmd:%d,%s"%(self.stop_heating,params)) 
+            self.move_with_transform(self.last_position, self.speed)
+        elif 'X' in params:
+            if '240' in params['X'] or '200' in params['X']:
+               # gcmd.respond_info("G1_cmdx:%d,%s"%(self.stop_heating,params))             
+                self.move_with_transform(self.last_position, self.speed)
+                
     # G-Code coordinate manipulation
     def cmd_G20(self, gcmd):
         # Set units to inches

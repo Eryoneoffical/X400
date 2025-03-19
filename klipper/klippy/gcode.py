@@ -105,6 +105,7 @@ class GCodeDispatch:
         self.mux_commands = {}
         self.gcode_help = {}
         self.status_commands = {}
+       
         # Register commands needed before config file is loaded
         handlers = ['M110', 'M112', 'M115',
                     'RESTART', 'FIRMWARE_RESTART', 'ECHO', 'STATUS', 'HELP']
@@ -186,6 +187,7 @@ class GCodeDispatch:
     # Parse input into commands
     args_r = re.compile('([A-Z_]+|[A-Z*/])')
     def _process_commands(self, commands, need_ack=True):
+        
         for line in commands:
             # Ignore comments and leading/trailing spaces
             line = origline = line.strip()
@@ -231,6 +233,10 @@ class GCodeDispatch:
             heaters.stop_heating = 1
             heaters = pheaters.lookup_heater('heater_bed')
             heaters.stop_heating = 1
+            probe = self.printer.lookup_object('probe', None)
+            probe.stop_heating = 1
+            gcode_move = self.printer.lookup_object('gcode_move')
+            gcode_move.stop_heating = 1
             #raise self.respond_info("Too many retries")
        #     raise self.printer.command_error("Must home before probe")
            # print("stop_heating2:%d"%heaters.stop_heating)
@@ -239,6 +245,8 @@ class GCodeDispatch:
             self.respond_info("stop_heating2:%d"%heaters.stop_heating)
             #self._process_commands("G1 X10", need_ack=False)
            # return
+        
+
         with self.mutex:
             self._process_commands(script.split('\n'), need_ack=False)
     def get_mutex(self):

@@ -116,6 +116,14 @@ class Heater:
         #if self.stop_heating == 1:
            self.gcode.respond_info("stop_heating:check_busy")
            self.stop_heating = 0 
+           self.gcode = self.printer.lookup_object('gcode')
+        
+           self.gcode.respond_info("stop_heating:compeleted")
+           probe = self.printer.lookup_object('probe', None)
+           probe.stop_heating = 0
+           gcode_move = self.printer.lookup_object('gcode_move')
+           gcode_move.stop_heating = 0
+            
            return 0
            #self.smoothed_temp=self.target_temp=0
        # self.gcode.respond_info("check_busy3:%d" %self.stop_heating)   
