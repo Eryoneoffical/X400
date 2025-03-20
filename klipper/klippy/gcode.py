@@ -245,8 +245,21 @@ class GCodeDispatch:
             self.respond_info("stop_heating2:%d"%heaters.stop_heating)
             #self._process_commands("G1 X10", need_ack=False)
            # return
+        toolhead = self.printer.lookup_object('toolhead')
+        curtime = self.printer.get_reactor().monotonic()
+        if 'x' not in toolhead.get_status(curtime)['homed_axes']:
+            pheaters = self.printer.lookup_object('heaters')
+            heaters = pheaters.lookup_heater('extruder')
+            heaters.stop_heating = 0
+            heaters = pheaters.lookup_heater('heater_bed')
+            heaters.stop_heating = 0
+            probe = self.printer.lookup_object('probe', None)
+            probe.stop_heating = 0
+            gcode_move = self.printer.lookup_object('gcode_move')
+            gcode_move.stop_heating = 0
         
-
+            #self.respond_info("x not in homed axes:%s"%script)
+             
         with self.mutex:
             self._process_commands(script.split('\n'), need_ack=False)
     def get_mutex(self):
