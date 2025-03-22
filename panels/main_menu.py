@@ -84,8 +84,8 @@ class Panel(MenuPanel):
     def wait_confirm(self, dialog, response_id, program):
         if response_id == Gtk.ResponseType.CANCEL:
             self._gtk.remove_dialog(dialog)
-            file = open('/home/mks/printer_data/config/variable.cfg', 'w')
-            file.close()
+            #file = open('/home/mks/printer_data/config/variable.cfg', 'w')
+            #file.close()
             return
         self._screen._ws.klippy.gcode_script(f"RESUME_INTERRUPTED")
         self._gtk.remove_dialog(dialog)
@@ -115,13 +115,15 @@ class Panel(MenuPanel):
                                   G4 P1000
                                   M117 .
                                   SAVE_VARIABLE VARIABLE=allcalibrate VALUE=0
-                                  SAVE_CONFIG
+                                  M117 ALL calibrate_finish
+                                  
                                           """}
 
-        self._screen._ws.send_method("printer.gcode.script",script)
+        self._screen._ws.send_method("printer.gcode.script", script)
         self._gtk.remove_dialog(dialog)
-        file = open('/home/mks/printer_data/config/variable.cfg', 'w')
-        file.close()
+        self._screen.base_panel.action_bar.set_sensitive(False)
+        #file = open('/home/mks/printer_data/config/variable.cfg', 'w')
+        #file.close()
 
     def wait_confirm_reboot(self, dialog, response_id, program):
         if response_id == Gtk.ResponseType.CANCEL:
