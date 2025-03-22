@@ -58,23 +58,26 @@ class Panel(ScreenPanel):
                                            "printer.gcode.script", script)
         script = {"script": """
                                   ABORT
-                                  M117 PID_CALIBRATE in progress
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 15 minutes 
                                   G28  
                                   G1 X200 Y200 Z50 
                                   M119
                                   M106 S255
+                                  M140 S50
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 14 minutes
                                   PID_CALIBRATE HEATER=extruder TARGET=220
-                                  PID_CALIBRATE HEATER=heater_bed TARGET=60
                                   M106 S255
-                                  M117 SHAPER CALIBRATE in progress
+                                  M117 SHAPER CALIBRATE in progress,time left: 11 minutes 
                                   SHAPER_CALIBRATE
+                                  M140 S0
                                   M107
                                   M104 S150
                                   G28
-                                  M117 QUAD_GANTRY_LEVEL in progress
+                                  M117 QUAD_GANTRY_LEVEL in progress, time left: 1 minutes
                                   G28
                                   _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
                                   G4 P1000
+                                  M104 S0
                                   SAVE_VARIABLE VARIABLE=allcalibrate VALUE=0
                                   M117 ALL calibrate_finish
                                   """}
@@ -154,8 +157,36 @@ class Panel(ScreenPanel):
             if button in self.buttons:
                 self.buttons[button].set_sensitive(not busy)
 
+    def _dialog_show(self, widget, text, method, params=None):
+        buttons = [
+            {"name": _("OK"), "response": Gtk.ResponseType.CANCEL}
+        ]
+
+       # label = Gtk.Label(text)
+        label = Gtk.Label()
+        label.set_markup(text)
+        label.set_hexpand(True)
+        label.set_halign(Gtk.Align.CENTER)
+        label.set_vexpand(True)
+        label.set_valign(Gtk.Align.CENTER)
+        label.set_line_wrap(True)
+        label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+
+        self.confirm = self._gtk.Dialog(self._screen, buttons, label, self._confirm_send_action_response, method, params)
+       # dialog =       self._gtk.Dialog(self._screen, buttons, scroll, self.reboot_poweroff_update_confirm, method)
+        self.confirm.set_title("KlipperScreen")
+
     def process_update(self, action, data):
         #logging.info(f"### data {data}, action {action}")
+        if action == "notify_gcode_response":
+            if data.startswith("!!"):# error
+                self._screen.base_panel.action_bar.set_sensitive(True)
+                data = data.replace("!! ", "")
+                script = {"script": "M117 Calibration Failed: "+data}
+                self._screen._send_action(None, "printer.gcode.script", script)
+
+                script = {"script": " "}
+                self._dialog_show(self._screen, "Calibration Failed! Problem:" + data, "printer.gcode.script", script)
 
         if action == "notify_status_update":
            #logging.info(f"### data {data}, action {action}")

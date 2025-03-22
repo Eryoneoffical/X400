@@ -228,7 +228,14 @@ class Panel(ScreenPanel):
                                  universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                                  )
             self.add_gcode("response", time.time(), out.stdout)
-
+        elif cmd.find("rst") ==0:
+            self._screen._ws.klippy.gcode_script('SAVE_VARIABLE VARIABLE=allcalibrate VALUE=1')
+            out = subprocess.run(['sync'],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                                 )
+            self.add_gcode("response", time.time(), out.stdout)
         else:
             self._screen._ws.klippy.gcode_script(cmd)
 

@@ -96,27 +96,28 @@ class Panel(MenuPanel):
         self._screen.show_panel("calibrate", _("calibrating"))
         script = {"script": """
                                   ABORT
-                                  M117 PID_CALIBRATE
-                                  G28 
-                                  M117 PID_CALIBRATE
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 15 minutes 
+                                  G28  
                                   G1 X200 Y200 Z50 
                                   M119
                                   M106 S255
+                                  M140 S50
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 14 minutes
                                   PID_CALIBRATE HEATER=extruder TARGET=220
-                                  PID_CALIBRATE HEATER=heater_bed TARGET=60
                                   M106 S255
-                                  M117 SHAPER_CALIBRATE
+                                  M117 SHAPER CALIBRATE in progress,time left: 11 minutes 
                                   SHAPER_CALIBRATE
+                                  M140 S0
                                   M107
                                   M104 S150
                                   G28
-                                  M117 QUAD_GANTRY_LEVEL
+                                  M117 QUAD_GANTRY_LEVEL in progress, time left: 1 minutes
+                                  G28
                                   _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
                                   G4 P1000
-                                  M117 .
+                                  M104 S0
                                   SAVE_VARIABLE VARIABLE=allcalibrate VALUE=0
                                   M117 ALL calibrate_finish
-                                  
                                           """}
 
         self._screen._ws.send_method("printer.gcode.script", script)
@@ -148,10 +149,10 @@ class Panel(MenuPanel):
                     print("Read file End or Error")
                     break
                 elif 'allcalibrate = 1' in line:
-                    label = Gtk.Label("Calibrate printer: PID+BED+INPUTSHAPER? that may need about 20 minutes." )
+                    label = Gtk.Label("Please calibrate the printer first, that needs about 15 minutes.")
                     buttons = [
                         {"name": _("Calibrate"), "response": Gtk.ResponseType.OK},
-                        {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
+                        {"name": _("Later"), "response": Gtk.ResponseType.CANCEL}
                     ]
                     scroll = self._gtk.ScrolledWindow()
                     scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
