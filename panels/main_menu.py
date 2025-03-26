@@ -139,6 +139,7 @@ class Panel(MenuPanel):
     def activate(self):
         self.update_graph_visibility()
         self._screen.base_panel_show_all()
+        self._screen.base_panel.action_bar.set_sensitive(True)
         logging.debug(f"main_menu.py...")
         # calibration
         try:
