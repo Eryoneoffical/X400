@@ -236,6 +236,14 @@ class Panel(ScreenPanel):
                                  universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                                  )
             self.add_gcode("response", time.time(), out.stdout)
+        elif cmd.find("sh ") ==0:
+
+            logging.debug(cmd[3:].split(' '))
+            out = subprocess.run(['/home/mks/KlipperScreen/all/run_cmd.sh', cmd[3:]], stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                                 )
+            self.add_gcode("response", time.time(), out.stdout)
         else:
             self._screen._ws.klippy.gcode_script(cmd)
 
