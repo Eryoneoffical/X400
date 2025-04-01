@@ -243,6 +243,7 @@ class Panel(ScreenPanel):
                                  stderr=subprocess.STDOUT,
                                  universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                                  )
+            logging.debug(out.stdout)
             self.add_gcode("response", time.time(), out.stdout)
         else:
             self._screen._ws.klippy.gcode_script(cmd)
