@@ -1349,11 +1349,19 @@ class ProfileManager:
         cfg_name = self.name + " " + prof_name
         # set params
         z_values = ""
+        min_z = max_z = probed_matrix[0][0]
         for line in probed_matrix:
             z_values += "\n  "
             for p in line:
                 z_values += "%.6f, " % p
+                if min_z > p:
+                    min_z = p
+                if max_z < p:
+                    max_z = p
             z_values = z_values[:-2]
+        self.gcode.respond_info(
+                    "height map range:%.6f"
+                    % (max_z-min_z))    
         configfile.set(cfg_name, 'version', PROFILE_VERSION)
         configfile.set(cfg_name, 'points', z_values)
         for key, value in mesh_params.items():

@@ -26,6 +26,7 @@ class Panel(ScreenPanel):
             'bed_pid': self._gtk.Button("heat-up", _("PID calibrate")+'BED', "color4"),
             'motors_off': self._gtk.Button("z-tilt", _("Z Tilt"), "color4"),
         }
+        self.height_map_range = ''
         script = {"script": """M117 SHAPER_CALIBRATE
                            G28
                            SHAPER_CALIBRATE
@@ -76,6 +77,7 @@ class Panel(ScreenPanel):
                                   M117 QUAD_GANTRY_LEVEL in progress, time left: 1 minutes
                                   G28
                                   _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
+                                  BED_MESH_CALIBRATE PROFILE='default'
                                   G4 P1000
                                   M104 S0
                                   SAVE_VARIABLE VARIABLE=allcalibrate VALUE=0
@@ -187,7 +189,10 @@ class Panel(ScreenPanel):
 
                 script = {"script": " "}
                 self._dialog_show(self._screen, "Calibration Failed! Problem:" + data, "printer.gcode.script", script)
-
+            #logging.info(f"### data {data}, action {action}")
+            if "height map range:" in data:
+                self.height_map_range = data
+                #logging.info(f"startswith ")
         if action == "notify_status_update":
            #logging.info(f"### data {data}, action {action}")
             if "display_status" in data and "message" in data["display_status"] and data['display_status'] is not None:
@@ -206,7 +211,7 @@ class Panel(ScreenPanel):
                     script = {"script": "M117 ."}
                     self._screen._send_action(None, "printer.gcode.script", script)
                     script = {"script": "save_config"}
-                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?", "printer.gcode.script", script)
+                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?\n"+self.height_map_range, "printer.gcode.script", script)
 
         if action == "notify_busy":
             self.process_busy(data)
