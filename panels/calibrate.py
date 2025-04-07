@@ -27,6 +27,7 @@ class Panel(ScreenPanel):
             'motors_off': self._gtk.Button("z-tilt", _("Z Tilt"), "color4"),
         }
         self.height_map_range = ''
+        self.retrying = ''
         script = {"script": """M117 SHAPER_CALIBRATE
                            G28
                            SHAPER_CALIBRATE
@@ -190,8 +191,10 @@ class Panel(ScreenPanel):
                 script = {"script": " "}
                 self._dialog_show(self._screen, "Calibration Failed! Problem:" + data, "printer.gcode.script", script)
             #logging.info(f"### data {data}, action {action}")
-            if "height map range:" in data:
+            if "height map range:" in data:#Retrying
                 self.height_map_range = data
+            if "Retrying" in data:  # Retrying
+                self.retrying += 'Retrying '
                 #logging.info(f"startswith ")
         if action == "notify_status_update":
            #logging.info(f"### data {data}, action {action}")
@@ -211,7 +214,9 @@ class Panel(ScreenPanel):
                     script = {"script": "M117 ."}
                     self._screen._send_action(None, "printer.gcode.script", script)
                     script = {"script": "save_config"}
-                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?\n"+self.height_map_range, "printer.gcode.script", script)
+                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?\n"+self.height_map_range+"\n"+self.retrying, "printer.gcode.script", script)
+                    self.height_map_range = ""
+                    self.retrying = ""
 
         if action == "notify_busy":
             self.process_busy(data)

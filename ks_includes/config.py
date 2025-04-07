@@ -11,6 +11,7 @@ import locale
 from io import StringIO
 
 SCREEN_BLANKING_OPTIONS = [
+    5,     # 5 second
     60,     # 1 Minute
     120,    # 2 Minutes
     300,    # 5 Minutes
