@@ -159,6 +159,7 @@ class KlipperScreen(Gtk.Window):
 
         self.initial_connection()
         subprocess.run(["/home/mks/KlipperScreen/all/lcd_180.sh", ""])  # luojin
+        subprocess.run(["/home/mks/KlipperScreen/all/run_cmd.sh", "/sbin/ifconfig eth0 169.254.237.208"])
 
     def pused_state(self):
         logging.debug(f"pused_state.........")
@@ -735,9 +736,9 @@ class KlipperScreen(Gtk.Window):
 
         try:
             IP_addres = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
-            if "192.168" in IP_addres:
+            #if "192.168" in IP_addres:
                 #logging.debug("IP_addres %s" % (IP_addres))
-                self.show_title_IP += IP_addres
+            self.show_title_IP += IP_addres
         except Exception as e:
             pass
 
