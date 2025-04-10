@@ -96,6 +96,10 @@ class Panel(MenuPanel):
         self._screen.show_panel("calibrate", _("calibrating"))
         script = {"script": """
                                   ABORT
+                                  SET_PIN PIN=LED VALUE=0.50
+                                  SET_FAN_SPEED FAN=filter_fan SPEED=0.5
+                                  SET_PIN PIN=Board_FAN VALUE=0.50
+                                  M106 S100
                                   M117 Extruder PID_CALIBRATE  in progress,time left: 15 minutes 
                                   G28  
                                   G1 X200 Y200 Z50 
