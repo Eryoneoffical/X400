@@ -113,20 +113,16 @@ def get_path(folders):
    # 
          
 get_path(folders)    
-logging.basicConfig(handlers=[logging.FileHandler(filename=folders['logs']+"farm3d.log", 
-                                                 encoding='utf-8', mode='a+')],
-                    format="%(asctime)s  %(message)s", 
-                    datefmt="%F %A %T", 
-                    level=logging.INFO)
 
 
-logging.info(' ')
-logging.info('Staring Farm3D ...... ')
-logging.info(' ')
-logging.info('Name:'+printer_host)
-logging.info('MAC address:'+ipmac0)
-logging.info(' ')
-logging.info(folders)
+
+#logging.info(' ')
+#logging.info('Staring Farm3D ...... ')
+#logging.info(' ')
+#logging.info('Name:'+printer_host)
+#logging.info('MAC address:'+ipmac0)
+#logging.info(' ')
+#logging.info(folders)
 
 
 
@@ -408,17 +404,22 @@ def image_update(type):
 def on_connect(client,userdata,flags,rc,mq):
 
     if rc == 0:
+        logging.basicConfig(handlers=[logging.FileHandler(filename=folders['logs']+"farm3d.log", 
+                                                 encoding='utf-8', mode='a+')],
+                    format="%(asctime)s  %(message)s", 
+                    datefmt="%F %A %T", 
+                    level=logging.INFO)
         logging.info("connected with result code:" + str(rc))
         client.subscribe(topic + printer_name +"/control/run_gcode")
-    else:
+    #else:
         # 如果链接断开，尝试重新连接
-        logging.info("Failed to reconnect to MQTT broker")
+     #   logging.info("Failed to reconnect to MQTT broker")
         
 def on_disconnect(client,userdata,rc,mq1,mq2):
     global connect_problem
     if rc != 0:
-        logging.info("disconnented from MQTT :"+str(rc))
-        print("disconnented from MQTT :"+str(rc))
+       # logging.info("disconnented from MQTT :"+str(rc))
+       # print("disconnented from MQTT :"+str(rc))
         connect_problem = 1
     	
 def is_file_download(path,name):
@@ -630,8 +631,8 @@ client.username_pw_set(username, password)
 
 
 if int(port) > 0 :
-    logging.info(broker)
-    logging.info(port)
+    #logging.info(broker)
+    #logging.info(port)
     client.connect(broker, int(port))
 else :
     client.connect(broker)
@@ -654,7 +655,7 @@ while True:
     else:
         time.sleep(3)
     if connect_problem == 1 or exit_flag == 1:
-        logging.info("go to exit")
+       # logging.info("go to exit")
         exit()
     pulish_status(0)
 
