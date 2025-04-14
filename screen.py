@@ -986,9 +986,9 @@ class KlipperScreen(Gtk.Window):
         # Moonraker is ready, set a loop to init the printer
         self.reinit_count += 1
 
-        powerdevs = self.apiclient.send_request("machine/device_power/devices")
-        if powerdevs is not False:
-            self.printer.configure_power_devices(powerdevs['result'])
+        #powerdevs = self.apiclient.send_request("machine/device_power/devices")
+        #if powerdevs is not False:
+        #    self.printer.configure_power_devices(powerdevs['result'])
 
         if state['result']['klippy_connected'] is False:
             logging.info("Klipper not connected")
