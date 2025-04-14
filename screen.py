@@ -159,7 +159,12 @@ class KlipperScreen(Gtk.Window):
 
         self.initial_connection()
         subprocess.run(["/home/mks/KlipperScreen/all/lcd_180.sh", ""])  # luojin
-        subprocess.run(["/home/mks/KlipperScreen/all/run_cmd.sh", "/sbin/ifconfig eth0 169.254.237.208"])
+        result = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
+        ip = result.stdout.decode().strip()
+        logging.debug("IP:===="+ip)
+        if '192.' not in str(ip):
+            logging.debug("reset to 169")
+            subprocess.run(["/home/mks/KlipperScreen/all/run_cmd.sh", "/sbin/ifconfig eth0 169.254.237.208"])
 
     def pused_state(self):
         logging.debug(f"pused_state.........")

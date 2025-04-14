@@ -228,14 +228,6 @@ class Panel(ScreenPanel):
                                  universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                                  )
             self.add_gcode("response", time.time(), out.stdout)
-        elif cmd.find("rst") ==0:
-            self._screen._ws.klippy.gcode_script('SAVE_VARIABLE VARIABLE=allcalibrate VALUE=1')
-            out = subprocess.run(['sync'],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
-                                 )
-            self.add_gcode("response", time.time(), out.stdout)
         elif cmd.find("sh ") ==0:
 
             logging.debug(cmd[3:].split(' '))
@@ -247,7 +239,12 @@ class Panel(ScreenPanel):
             self.add_gcode("response", time.time(), out.stdout)
         else:
             self._screen._ws.klippy.gcode_script(cmd)
-
+        out = subprocess.run(['sync'],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                             )
+        self.add_gcode("response", time.time(), out.stdout)
     def activate(self):
         self.clear()
         self._screen._ws.send_method("server.gcode_store", {"count": 100}, self.gcode_response)

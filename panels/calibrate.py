@@ -64,19 +64,21 @@ class Panel(ScreenPanel):
                                   SET_FAN_SPEED FAN=filter_fan SPEED=0.5
                                   SET_PIN PIN=Board_FAN VALUE=0.50
                                   M106 S100
-                                  M117 Extruder PID_CALIBRATE  in progress,time left: 15 minutes 
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 20 minutes 
                                   G28  
                                   G1 X200 Y200 Z50 
                                   M119
                                   M106 S255
                                   M140 S50
-                                  M117 Extruder PID_CALIBRATE  in progress,time left: 14 minutes
+                                  M117 Extruder PID_CALIBRATE  in progress,time left: 19 minutes
                                   PID_CALIBRATE HEATER=extruder TARGET=220
                                   M106 S255
-                                  M117 SHAPER CALIBRATE in progress,time left: 11 minutes 
+                                  M117 SHAPER CALIBRATE in progress,time left: 16 minutes 
                                   SHAPER_CALIBRATE
                                   M140 S0
                                   M107
+                                  M117 Bed PID_CALIBRATE in progress,time left: 10 minutes 
+                                  PID_CALIBRATE HEATER=heater_bed TARGET=60
                                   M104 S150
                                   G28
                                   M117 QUAD_GANTRY_LEVEL in progress, time left: 1 minutes
