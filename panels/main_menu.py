@@ -157,7 +157,7 @@ class Panel(MenuPanel):
                     print("Read file End or Error")
                     break
                 elif 'allcalibrate = 1' in line:
-                    label = Gtk.Label("Please calibrate the printer first, that needs about 15 minutes.")
+                    label = Gtk.Label("Please calibrate the printer first, that needs about 22 minutes.")
                     buttons = [
                         {"name": _("Calibrate"), "response": Gtk.ResponseType.OK},
                         {"name": _("Later"), "response": Gtk.ResponseType.CANCEL}

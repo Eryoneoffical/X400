@@ -185,6 +185,25 @@ class Panel(ScreenPanel):
        # dialog =       self._gtk.Dialog(self._screen, buttons, scroll, self.reboot_poweroff_update_confirm, method)
         self.confirm.set_title("KlipperScreen")
 
+    def _confirm_calibrate_action(self, widget, text, method, params=None):
+        buttons = [
+            {"name": _("Save"), "response": Gtk.ResponseType.OK},
+
+        ]
+
+       # label = Gtk.Label(text)
+        label = Gtk.Label()
+        label.set_markup(text)
+        label.set_hexpand(True)
+        label.set_halign(Gtk.Align.CENTER)
+        label.set_vexpand(True)
+        label.set_valign(Gtk.Align.CENTER)
+        label.set_line_wrap(True)
+        label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+
+        self.confirm = self._gtk.Dialog(self._screen, buttons, label, self._confirm_send_action_response, method, params)
+       # dialog =       self._gtk.Dialog(self._screen, buttons, scroll, self.reboot_poweroff_update_confirm, method)
+        self.confirm.set_title("KlipperScreen")
     def process_update(self, action, data):
         #logging.info(f"### data {data}, action {action}")
         if action == "notify_gcode_response":
@@ -220,7 +239,7 @@ class Panel(ScreenPanel):
                     script = {"script": "M117 ."}
                     self._screen._send_action(None, "printer.gcode.script", script)
                     script = {"script": "save_config"}
-                    self._confirm_send_action(self._screen, lcd_msg + ",  Save to Printer?\n"+self.height_map_range+"\n"+self.retrying, "printer.gcode.script", script)
+                    self._confirm_calibrate_action(self._screen, lcd_msg + ",  Save to Printer?\n"+self.height_map_range+"\n"+self.retrying, "printer.gcode.script", script)
                     self.height_map_range = ""
                     self.retrying = ""
 
