@@ -119,7 +119,7 @@ class Panel(MenuPanel):
                                   G28
                                   M117 QUAD_GANTRY_LEVEL in progress, time left: 1 minutes
                                   G28
-                                  _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=1 LIFT_SPEED=5
+                                  _QUAD_GANTRY_LEVEL  horizontal_move_z=10 retry_tolerance=0.05 LIFT_SPEED=5
                                   BED_MESH_CALIBRATE PROFILE='default'
                                   G4 P1000
                                   M104 S0
