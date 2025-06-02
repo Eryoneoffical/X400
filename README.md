@@ -32,6 +32,9 @@ go to https://eryone.club , then send `Update Software` command in the console p
 4. Get the CAN UUID numbers from the printer screen: Memu-->Console-->Send `W`  (note:not `w` but `W`)
 5. Back to the Menu and click: Firmware Restart, if it failed please restart the printer and run  Memu-->Console-->Send `W`  again.
 
+### orca slicer
+https://drive.google.com/drive/folders/1htD4KUY9WmH9W7UyBleRF0uzNoNothT1?usp=drive_link
+
 ### Software of Farm3D 
 More information: [https://github.com/Eryone/farm3d](https://github.com/Eryone/farm3d)
 
