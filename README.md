@@ -11,7 +11,7 @@ There are 3 ways to update and don't forget to reboot the printer after that:
 ```
 cd ~
 mv KlipperScreen KlipperScreen_bk
-git clone https://gitee.com/everyone3d/KlipperScreen
+git clone https://github.com/Eryoneoffical/x400.git
 ~/KlipperScreen/all/git_pull.sh
 
 ```
