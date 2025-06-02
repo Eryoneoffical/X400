@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.cn/cdnjs/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {font-family: Arial;}
+
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+
+.tab button.active {
+  background-color: #ccc;
+}
+
+
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.icon-bar {
+  width: 100px;
+  background-color: #555;
+  overflow: auto;
+}
+
+.icon-bar a {
+  float: left;
+  width: 100%;
+  text-align: center;
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 36px;
+}
+
+.icon-bar a:hover {
+  background-color: #000;
+}
+
+.active {
+  background-color: #4CAF50;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="tab">
+  
+  <button   class="tablinks " onclick="openCity(event, 'printers')"  id="defaultOpen">Printers</button>
+  <button class="tablinks" onclick="openCity(event, 'settings')">Setting</button>
+  <button class="tablinks icon-bar" onclick="printers_scan()">SCAN</button>
+</div>
+
+<div id="printers" class="tabcontent">
+  <div id="container" style="width: 90%;height:800px">
+     
+  
+   
+  </div>
+</div>
+
+<div id="settings" class="tabcontent">
+  <h3>scan printers</h3>
+  <div class="icon-bar">
+  <a href="#"><i class="fa fa-search"></i></a> 
+
+</div>
+  
+</div>
+
+
+<script>
+document.getElementById("defaultOpen").click();
+
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+ function printers_scan() {
+  theUrl=window.location.origin+'/printer/gcode/script?script=RUN_SHELL_COMMAND%20CMD=SCAN_ALL_PRINTER'
+  alert(theUrl)
+  var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+			window.location.reload();
+            //callback(xmlHttp.responseText);
+        }
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlHttp.send(null);
+  
+}
+ function printers(name, ip) {
+  this.name = name;
+  this.ip = ip;
+  
+}
+var nums_p=0;
+//var person = new printers('John Doe', 30, 'Male');
+ var online_p = new Array();
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlHttp.send(null);
+}
+
+function callback_get_ip(resText)
+{
+
+	//
+	
+	resText=resText.split(/[(\n)\n]+/)
+	const element = document.getElementById("container");
+	for(var i =0; i <resText.length-1;i++)
+	{
+		var nams=resText[i].split(",");
+		
+		var contains=0;
+		for (var j=0;j<nums_p;j++)
+		{
+			if (online_p[j].name == nams[0])
+				contains=1;
+			
+				
+		}
+		if(contains)	
+			continue; 
+		online_p[nums_p]=new printers(nams[0],nams[1]);
+		//alert(online_p[nums_p].ip); 
+		element.innerHTML  += '<iframe src="http://'+online_p[nums_p].ip+'/" target="_blank"   frameborder="0" name="ifa" style=" width:50%;height:50%"></iframe>';
+		nums_p++;
+	}
+    
+}
+var Get_url =window.location.href+'/printers.txt?randombit='+Math.random();
+//alert(Get_url); 
+httpGetAsync(Get_url, callback_get_ip);
+</script>   
+</body>
+</html> 
+
+

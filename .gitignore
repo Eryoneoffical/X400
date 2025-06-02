@@ -1,0 +1,13 @@
+.idea/
+.idea/workspace.xml
+__pycache__/
+*.py[cod]
+*$py.class
+dist/
+build/
+venv/
+ks_includes/__pycache__/
+ks_includes/widgets/__pycache__/
+panels/__pycache__/
+*.pyc
+all/hostname
