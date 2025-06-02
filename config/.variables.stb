@@ -1,0 +1,6 @@
+[Variables]
+power_resume_z = 2.7
+was_interrupted = True
+
+
+filename = 'CFFFP_coil_case.gcode'

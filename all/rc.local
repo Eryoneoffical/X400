@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+#echo makerbase | sudo -S usbreset 802.11\ n\ WLAN
+#echo makerbase | sudo -S /home/mks/monitor.sh &
+#xrandr -display :0.0 -q --verbose -o inverted
+sed -i 's/needreboot = 1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
+sed -i 's/needreboot =1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
+sed -i 's/needreboot=1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
+sed -i 's/needreboot= 1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
+#    curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=needreboot%20VALUE=0
+exit 0
