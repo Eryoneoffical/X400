@@ -157,7 +157,7 @@ class KlipperScreenConfig:
                 bools = (
                     'invert_x', 'invert_y', 'invert_z', '24htime',  'show_cursor', 'confirm_estop',
                      'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'use-matchbox-keyboard',
-                     'use_ai','use_cloud'
+                     'use_ai','use_cloud', 'use_chamber'
                 )
                 strs = (
                     'default_printer', 'language', 'print_sort_dir', 'theme', 'screen_blanking', 'font_size',
@@ -276,6 +276,8 @@ class KlipperScreenConfig:
                           "value": "True", "callback": screen.set_ai}},
             {"use_cloud": {"section": "main", "name": _("Connect to Cloud"), "type": "binary",
                         "value": "True", "callback": screen.set_cloud}},
+            {"use_chamber": {"section": "main", "name": _("Chamber heating"), "type": "binary",
+                           "value": "False", "callback": screen.set_chamber}},
          #   {"autoclose_popups": {"section": "main", "name": _("Auto-close notifications"), "type": "binary",
           #                        "value": "True"}},
            # {"show_heater_power": {"section": "main", "name": _("Show Heater Power"), "type": "binary",

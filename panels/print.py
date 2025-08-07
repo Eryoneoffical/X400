@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import configparser
 import hashlib
 import json
 import logging
@@ -21,7 +22,7 @@ class ProgressBarWindow(Gtk.Window):
     def __init__(self,screen):
         super().__init__(title="ProgressBar Demo")
         #self.set_border_width(100)
-
+        self.entry_z = None
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.add(vbox)
         
@@ -60,7 +61,9 @@ class Panel(ScreenPanel):
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
+        self.entry_z = None
         self.gtk = screen.gtk
+        self.distance = 0.05
         sortdir = self._config.get_main_config().get("print_sort_dir", "name_asc")
         sortdir = sortdir.split('_')
         if sortdir[0] not in ["name", "date"] or sortdir[1] not in ["asc", "desc"]:
@@ -398,9 +401,10 @@ class Panel(ScreenPanel):
         self._config.save_user_config_options()
 
     def confirm_print(self, widget, filename):
-
+        logging.debug(f"type: {Gtk.ResponseType}")
         buttons = [
             {"name": _("Print"), "response": Gtk.ResponseType.OK},
+           # {"name": _("Resume"), "response": Gtk.ResponseType.ACCEPT},
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
         ]
 
@@ -419,14 +423,20 @@ class Panel(ScreenPanel):
         grid.set_valign(Gtk.Align.CENTER)
         grid.add(label)
 
-        pixbuf = self.get_file_image(filename, self._screen.width * .9, self._screen.height * .6)
+        buttonz0 = self._gtk.Button(label=_("Resume"))
+        buttonz0.set_direction(Gtk.TextDirection.LTR)
+        buttonz0.connect("clicked", self.resume_print_confirm, filename)
+
+
+        pixbuf = self.get_file_image(filename, self._screen.width * .9, self._screen.height * .4)
         if pixbuf is not None:
             image = Gtk.Image.new_from_pixbuf(pixbuf)
             image.set_vexpand(False)
             grid.attach_next_to(image, label, Gtk.PositionType.BOTTOM, 1, 1)
+            grid.attach(buttonz0, 3, 0, 1, 1)
 
-        dialog = self._gtk.Dialog(self._screen, buttons, grid, self.confirm_print_response, filename)
-        dialog.set_title(_("Print"))
+        self.dialog_p = self._gtk.Dialog(self._screen, buttons, grid, self.confirm_print_response, filename)
+        self.dialog_p.set_title(_("Print"))
 
     def copy_callback(self,copied):
         if copied == 100:
@@ -504,11 +514,332 @@ class Panel(ScreenPanel):
         subprocess.run(["sync", ""])
         self._screen._ws.klippy.print_start(name)
 
+    @staticmethod
+    def validate_temp(temp):
+        try:
+            return float(temp)
+        except ValueError:
+            return 0
+    def update_entry(self, widget, digit):
+        text = self.labels['entry'].get_text()
+        if digit == 'B':
+            if len(text) < 1:
+                return
+            self.labels['entry'].set_text(text[:-1])
+        elif digit == 'E':
+            #self.change_temp(temp)
+            #self.labels['entry'].set_text("")
+           # self.labels["keypad"].set_visible(True)
+            logging.debug("update_entry")
+            self.keygrid.remove(self.labels["keypad"])
+            self.keygrid.remove(self.button_entry_ok)
+            self.keygrid.attach(self.adjust_z, 1, 1, 1, 1)
 
+            logging.debug("update_entry--")
+
+        elif len(text + digit) > 8:
+            return
+        else:
+            self.labels['entry'].set_text(text + digit)
+        self.resume_z = self.labels['entry'].get_text()
+        #self.pid.set_sensitive(self.validate_temp(self.labels['entry'].get_text()) > 9)
+
+    def show_numpad(self, widget, device):
+        logging.debug("update_entry- show")
+        self.keygrid.attach(self.labels["keypad"], 1, 1, 1, 1)
+        self.keygrid.attach(self.button_entry_ok, 2, 0, 1, 1)
+        self.keygrid.remove(self.adjust_z)
+
+    def hide_numpad(self, widget, device):
+        logging.debug("update_entry- hide-")
+        self.keygrid.remove(self.labels["keypad"])
+        self.keygrid.remove(self.button_entry_ok)
+        self.keygrid.attach(self.adjust_z, 1, 1, 1, 1)
+
+    def change_distance(self, widget, distance):
+        logging.info(f"### Distance {distance}")
+        if distance == 5:
+            self.buttonz_05.get_style_context().remove_class("distbutton_active")
+            self.buttonz_5.get_style_context().add_class("distbutton_active")
+        else:
+            self.buttonz_5.get_style_context().remove_class("distbutton_active")
+            self.buttonz_05.get_style_context().add_class("distbutton_active")
+        self.distance = distance
+    def adjust_nozzle(self, widget, up_down):
+        logging.info(f"### adjust_nozzle {up_down}{self.distance}")
+
+        self._screen._ws.klippy.gcode_script("SET_KINEMATIC_POSITION Z=10")
+        self._screen._ws.klippy.gcode_script("G91")
+        self._screen._ws.klippy.gcode_script(f"G1 Z{up_down}{self.distance}")
+        self._screen._ws.klippy.gcode_script("G90")
+
+
+    def resume_print_confirm(self, widget, filename):
+        self._gtk.remove_dialog(self.dialog_p)
+        buttons = [
+            {"name": _("Print"), "response": Gtk.ResponseType.YES},
+            {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
+        ]
+
+
+
+        label = Gtk.Label()
+        label.set_markup(f"<b>{filename}</b>\n")
+        label.set_hexpand(False)
+        label.set_halign(Gtk.Align.CENTER)
+        label.set_vexpand(False)
+        label.set_valign(Gtk.Align.CENTER)
+        label.set_line_wrap(True)
+        label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+
+        grid = Gtk.Grid()
+        grid.set_hexpand(False)
+        grid.set_vexpand(False)
+        grid.set_halign(Gtk.Align.CENTER)
+        grid.set_valign(Gtk.Align.CENTER)
+        #grid.set_homogeneous(True)
+        grid.set_row_spacing(1)
+        grid.set_column_spacing(1)
+        #grid.set_size_request(self.gtk.content_width / 10, self.gtk.keyboard_height / 10)
+       # grid.add(label)
+
+
+        #grid.add(self.entry_z)
+        #####
+        self.labels = {}
+        numpad = Gtk.Grid() #self._gtk.HomogeneousGrid()
+        numpad.set_size_request(100, 100)
+        numpad.set_hexpand(False)
+        numpad.set_vexpand(False)
+        numpad.set_direction(Gtk.TextDirection.LTR)
+        numpad.get_style_context().add_class('numpad')
+        numpad.set_halign(Gtk.Align.CENTER)
+        numpad.set_valign(Gtk.Align.CENTER)
+
+        keys = [
+            ['1', 'numpad_right'],
+            ['2', 'numpad_right'],
+            ['3', 'numpad_right'],
+            ['4', 'numpad_right'],
+            ['5', 'numpad_right'],
+            ['6', 'numpad_right'],
+            ['7', 'numpad_right'],
+            ['8', 'numpad_right'],
+            ['9', 'numpad_right'],
+            ['0', 'numpad_right'],
+            ['.', 'numpad_right'],
+            ['B', 'numpad_right'],
+           # ['E', 'numpad_right']
+        ]
+        for i in range(len(keys)):
+            k_id = f'button_{str(keys[i][0])}'
+            if keys[i][0] == "B":
+                self.labels[k_id] = self._gtk.Button("backspace", scale=0.6)
+            elif keys[i][0] == "E":
+                self.labels[k_id] = self._gtk.Button("complete", scale=0.7)
+            else:
+                self.labels[k_id] = Gtk.Button(label=keys[i][0])
+            self.labels[k_id].connect('clicked', self.update_entry, keys[i][0])
+            self.labels[k_id].get_style_context().add_class(keys[i][1])
+            numpad.attach(self.labels[k_id], i % 6, i / 6, 1, 1)
+        self.keygrid = grid
+        self.labels["keypad"] = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.labels['entry'] = Gtk.Entry()
+        self.labels['entry'].props.xalign = 0.5
+        self.labels['entry'].set_can_focus(False)
+
+        self.labels["keypad"] = numpad
+
+        #### read default height in variables.cfg
+        config = configparser.ConfigParser()
+        config.read('/home/mks/printer_data/config/variable.cfg')
+        logging.debug(f"All sections:{config['Variables']}")
+        if 'Variables' in config:
+            power_resume_z = config.get('Variables', 'power_resume_z', fallback=None)
+            if power_resume_z is not None:
+                power_resume_z = config['Variables']['power_resume_z']
+                self.resume_z = power_resume_z
+                self.labels['entry'].set_text(f"{power_resume_z}")
+                logging.debug(f"power_resume_z:{power_resume_z}" )
+
+        ###
+
+       # self.labels['entry'].connect("activate", self.hide_numpad)
+        self.labels['entry'].connect("focus-in-event", self.hide_numpad)
+        self.labels['entry'].connect("button-press-event", self.show_numpad)
+
+       # self.pid = self._gtk.Button('heat-up', _('Calibrate') + ' PID', None, .66, Gtk.PositionType.LEFT, 1)
+       # self.pid.connect("clicked", self.update_entry, "PID")
+        #self.pid.set_sensitive(False)
+       # self.pid.set_no_show_all(True)
+
+        label_en = Gtk.Label()
+        label_en.set_markup(_("Start") + " " + _("Height:") + "(mm)")
+
+
+        #grid.add(self.labels['entry'])
+        #grid.add(grid2)
+
+        grid.attach(label, 0, 0, 1, 1)
+
+        label_nozzle = Gtk.Label()
+        label_nozzle.set_markup(_("Adjust") +" "+ _("Nozzle:") )
+        self.adjust_z = Gtk.Grid()
+        self.adjust_z.set_hexpand(False)
+        self.adjust_z.set_vexpand(False)
+        self.adjust_z.set_direction(Gtk.TextDirection.LTR)
+        self.adjust_z.get_style_context().add_class('numpad')
+        self.adjust_z.set_halign(Gtk.Align.CENTER)
+        self.adjust_z.set_valign(Gtk.Align.CENTER)
+        buttonz0 = self._gtk.Button(label=_("Raise Nozzle"), scale=1)
+        buttonz1 = self._gtk.Button(label=_("Lower Nozzle"), scale=1)
+        self.buttonz_05 = self._gtk.Button(label="0.05", scale=1)
+        self.buttonz_5 = self._gtk.Button(label="5", scale=1)
+        self.buttonz_05.set_direction(Gtk.TextDirection.LTR)
+        self.buttonz_5.set_direction(Gtk.TextDirection.LTR)
+        buttonz0.connect("clicked", self.adjust_nozzle, "")
+        buttonz1.connect("clicked", self.adjust_nozzle, "-")
+        self.buttonz_05.connect("clicked", self.change_distance, 0.05)
+        self.buttonz_5.connect("clicked", self.change_distance, 5)
+
+        self.distance = 0.05
+        self.buttonz_5.get_style_context().remove_class("distbutton_active")
+        self.buttonz_05.get_style_context().add_class("distbutton_active")
+
+        #adjust_z.attach(self.labels['entry'], 0, 0, 1, 1)
+       # self.adjust_z.attach(label_nozzle, 0, 0, 1, 1)
+       # self.adjust_z.attach(label_nozzle, 1, 0, 1, 1)
+        self.adjust_z.attach(buttonz0, 0, 0, 1, 1)
+        self.adjust_z.attach(buttonz1, 1, 0, 1, 1)
+        self.adjust_z.attach(self.buttonz_05, 0, 1, 1, 1)
+        self.adjust_z.attach(self.buttonz_5, 1, 1, 1, 1)
+
+        self.entry_z = Gtk.Grid()
+        self.entry_z.set_hexpand(False)
+        self.entry_z.set_vexpand(False)
+        self.entry_z.set_direction(Gtk.TextDirection.LTR)
+        self.entry_z.get_style_context().add_class('numpad')
+        self.entry_z.set_halign(Gtk.Align.CENTER)
+        self.entry_z.set_valign(Gtk.Align.CENTER)
+        self.entry_z.attach(label_en, 0, 0, 1, 1)
+        self.entry_z.attach(self.labels['entry'], 1, 0, 1, 1)
+
+
+        grid.attach(self.entry_z, 1, 0, 1, 1)
+       # grid.attach(self.labels['entry'], 1, 0, 1, 1)
+
+        self.button_entry_ok = self._gtk.Button("complete", scale=0.7)
+        self.button_entry_ok.connect('clicked', self.update_entry, 'E')
+        grid.attach(self.button_entry_ok, 2, 0, 1, 1)
+
+       # grid.attach_next_to(numpad, self.labels['entry'], Gtk.PositionType.BOTTOM, 1, 1)
+       # grid.add(self.labels["keypad"])
+
+        #grid.attach(self.labels['entry'], 0, 0, 1, 1)
+
+        grid.attach(self.adjust_z, 1, 1, 1, 1)
+        grid.attach(self.labels["keypad"], 1, 1, 1, 1)
+        #self.keygrid.attach(self.labels["keypad"], 1, 2, 1, 1)
+
+        #grid.remove(self.labels["keypad"])
+        #grid.attach(numpad, 1, 0, 1, 1)
+
+        #grid.labels["keypad"] = numpad
+        ############
+
+        pixbuf = self.get_file_image(filename, 200, 200)
+        if pixbuf is not None:
+            image = Gtk.Image.new_from_pixbuf(pixbuf)
+            image.set_vexpand(False)
+            #grid.attach_next_to(image, label, Gtk.PositionType.BOTTOM, 1, 1)
+            grid.attach(image, 0, 1, 1, 1)
+
+        dialog = self._gtk.Dialog(self._screen, buttons, grid, self.confirm_print_response, filename)
+        dialog.set_title(_("Print"))
+        self.hide_numpad(None, None)
+
+
+    def search_large_file(self, file_path, keyword1, keyword2, keyword3):
+        buttons = [
+            {"name": _("OK"), "response": Gtk.ResponseType.CANCEL}
+        ]
+        labels = Gtk.Label()
+        labels.set_markup(
+            f"\n\n\n\nThe height value is incorrect!\n\nthere is no that height in the gcode file!\n\nmaybe out of range or "
+            f" {round(float(self.resume_z)-0.1,1)} or {round(float(self.resume_z)+0.1,1)} ")
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            for line_number, line in enumerate(file, 1):
+                if keyword1 in line or keyword2 in line:
+                    logging.debug(f"Line {line_number}: {line.strip()}")
+                    return True
+                elif keyword3 in line:
+                    if len(line) > 1:
+                        labels.set_markup(
+                            f"\n\n\n\nThe height value is incorrect!\n\n Please Try:   {line.split('Z')[1]}")
+                    break
+
+        labels.set_hexpand(False)
+        labels.set_halign(Gtk.Align.CENTER)
+        labels.set_vexpand(False)
+        labels.set_valign(Gtk.Align.CENTER)
+        labels.set_line_wrap(True)
+        labels.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        dialog2 = self._gtk.Dialog(self._screen, buttons, labels, self.check_confirm)
+        dialog2.set_title(_("Print"))
+        return False
+
+    def height_check(self, filename):
+        logging.debug(f"filename: {filename}")
+        if len(self.resume_z)<=0:
+            return False
+        if self.resume_z[-1] == '0' and '.' in self.resume_z:
+            self.resume_z = self.resume_z[:-1]
+        if self.resume_z[-1] == '.':
+            self.resume_z = self.resume_z[:-1]
+        if self.resume_z[0] == '0' and self.resume_z[1] == '.':
+            self.resume_z = self.resume_z[1:]
+
+        check_flag = self.search_large_file("/home/mks/printer_data/gcodes/" + filename,
+                                                          "G1 Z" + self.resume_z+"\n","G1 Z" + self.resume_z + " ","G1 Z" + self.resume_z)
+
+        logging.debug(f"height {check_flag}")
+        return check_flag
+    def resume_print(self, widget, filename):
+
+        logging.debug(f"filename: {filename}")
+        if self.resume_z[-1] == '0' and '.' in  self.resume_z:
+            self.resume_z = self.resume_z[:-1]
+        if self.resume_z[0] == '0' and self.resume_z[1] == '.':
+            self.resume_z = self.resume_z[1:]
+
+        file_name = filename.split('/')[-1].replace(" ","%20")
+        self._screen._ws.klippy.gcode_script(f"PRINT_CONTINUE Z={self.resume_z} FILE={file_name}")
+       
+        self._screen.show_popup_message(_("Processing ..."), 1, 30)
+
+    def check_confirm(self, dialog, response_id):
+        self._gtk.remove_dialog(dialog)
+        return
     def confirm_print_response(self, dialog, response_id, filename):
+
+        if response_id == Gtk.ResponseType.YES:
+            if self.height_check(filename):
+                self._gtk.remove_dialog(dialog)
+                self.resume_print(dialog, filename)
+            else:
+                logging.debug(f"height wrong11")
+
+                #self._screen.show_popup_message("Height wrong!", level=1)
+            return
+
         self._gtk.remove_dialog(dialog)
         if response_id == Gtk.ResponseType.CANCEL:
             return
+        if response_id == Gtk.ResponseType.ACCEPT:
+            self.resume_print_confirm(dialog, filename)
+            return
+
         total, used, free = shutil.disk_usage("/")
         if free / (2**20) < 200:
             self._screen.show_popup_message("No Space left,please delete some files")
@@ -517,7 +848,7 @@ class Panel(ScreenPanel):
         logging.debug("Total: %d GiB" % (total / (2 ** 30)))
         logging.debug("Used: %d GiB" % (used / (2 ** 30)))
         logging.debug("Free: %d MiB" % (free / (2 ** 20)))
-
+        #subprocess.run(["rm /tmp/klippy.log.20*", ""])
         logging.info(f"Starting print---------: {filename}")
        # self.change_dir(None, "/media/usb")
         if filename.find("usb/")==0 or filename.find("usb0/")==0 or filename.find("usb1/")==0 or filename.find("usb2/") == 0:

@@ -490,14 +490,14 @@ class Panel(ScreenPanel):
             elif method == "update":
                 GLib.idle_add(self._attach_progress_bar)
                 self._screen.show_popup_message("Waiting,this update may take about 5 to 10 minutes", 1, 10)
-                GLib.timeout_add_seconds(1, self.process_update, method)
+                GLib.timeout_add_seconds(1, self.process_update, method,'')
 
                # GLib.timeout_add_seconds(1, self.get_updates, "true")
                 subprocess.Popen(["/home/mks/mainsail/all/git_pull.sh", "&"])
             elif method == "recovery":
                 GLib.idle_add(self._attach_progress_bar)
                 self._screen.show_popup_message("Recovering, this may take about 1 minute", 1, 10)
-                GLib.timeout_add_seconds(1, self.process_update, "recovery")
+                GLib.timeout_add_seconds(1, self.process_update, "recovery",'')
                 subprocess.Popen(["/home/mks/mainsail/all/recovery.sh", "&"])
 
     def _attach_progress_bar(self):

@@ -107,6 +107,7 @@ class KlipperScreen(Gtk.Window):
         self.use_dpms = True
         self.use_ai = False
         self.use_cloud = True
+        self.use_chamber = False
         self.apiclient = None
         self.version = version
         self.dialogs = []
@@ -308,9 +309,10 @@ class KlipperScreen(Gtk.Window):
             self.attach_panel(panel_name)
         except Exception as e:
             logging.exception(f"Error attaching panel:\n{e}")
-
+       # logging.exception(f"  attaching panel: {self.panels}")
     def attach_panel(self, panel):
        #     self._ws.klippy.gcode_script(f"M600")
+
         self.base_panel.add_content(self.panels[panel])
         logging.debug(f"Current panel hierarchy: {' > '.join(self._cur_panels)}")
         self.base_panel.show_back(len(self._cur_panels) > 1)
@@ -571,13 +573,13 @@ class KlipperScreen(Gtk.Window):
         self.remove_keyboard()
         if self._config.get_main_config().getboolean('autoclose_popups', True):
             self.close_popup_message()
-        # if home or len(self._cur_panels) <= 1:
-        #     self.activate()
-        #     if not self.sync_index_check_md5():
-        #         logging.error("Failed to sync and check MD5. Returning to main menu aborted.")
-        #         return False
-        # else:
-        #     logging.info("Skipping sync and check MD5 for back action.")
+        if home or len(self._cur_panels) <= 1:
+            self.activate()
+            if not self.sync_index_check_md5():
+                logging.error("Failed to sync and check MD5. Returning to main menu aborted.")
+                return False
+        else:
+            logging.info("Skipping sync and check MD5 for back action.")
         while len(self._cur_panels) > 1:
             self._remove_current_panel()
             del self._cur_panels[-1]
@@ -595,7 +597,15 @@ class KlipperScreen(Gtk.Window):
             return False
         # self.panels['settings'].md5_value = self.calculate_md5(file_path)
 
-       # logging.info(f"Before synchronization, KlipperScreen.conf MD5: {self.panels['settings'].md5_value}")
+        if not 'settings' in self.panels or self.panels['settings'] is None:
+            logging.warning("Settings panel not loaded or initialized. Skipping MD5 check.")
+            return True
+        settings_panel = self.panels['settings']
+        if not hasattr(settings_panel, 'md5_value'):
+            logging.warning("Settings panel has no 'md5_value' attribute.")
+            return True
+
+        logging.info(f"Before synchronization, KlipperScreen.conf MD5: {self.panels['settings'].md5_value}")
         # if self.panels['settings'].md5_value is None:
         #     logging.error("Failed to calculate MD5.")
         #     return False
@@ -698,6 +708,7 @@ class KlipperScreen(Gtk.Window):
         script = {"script": f"SAVE_VARIABLE VARIABLE=use_ai VALUE={use_ai}"}
         self._ws.send_method("printer.gcode.script", script)
         logging.info(f"use_ai set to: {self.use_ai}")
+        os.system("sync")
         #self.set_screenblanking_timeout(self._config.get_main_config().get('screen_blanking'))
     def set_cloud(self, use_cloud):
         self.use_cloud = use_cloud
@@ -711,7 +722,20 @@ class KlipperScreen(Gtk.Window):
         else:
             os.system("echo makerbase | sudo -S systemctl stop farm3d.service")
             os.system("echo makerbase | sudo -S systemctl disable farm3d.service")
-        logging.info(f"use_ai set to: {self.use_cloud}")
+        os.system("sync")
+        logging.info(f"use_cloud set to: {self.use_cloud}")
+    def set_chamber(self, use_chamber):
+        self.use_chamber = use_chamber
+
+        if use_chamber is True:
+            os.system("sed -i '1 i [include chamber.cfg]' /home/mks/printer_data/config/printer.cfg")
+            self.show_popup_message(" Restart Klipper to apply this setting.\n\n Make sure the chamber heater is installed!", 1, 3)
+
+        else:
+            os.system("sed -i '/chamber.cfg/d' /home/mks/printer_data/config/printer.cfg")
+            self.show_popup_message("Restart Klipper to apply this setting.", 1, 3)
+        os.system("sync")
+        logging.info(f"use_chamber set to: {self.use_chamber}")
     def set_screenblanking_timeout(self, time):
         os.system("xset -display :0 s blank")
         os.system("xset -display :0 s off")
