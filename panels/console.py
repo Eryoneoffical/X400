@@ -1,3 +1,4 @@
+import os
 import time
 import re
 import gi
@@ -228,6 +229,12 @@ class Panel(ScreenPanel):
                                  universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                                  )
             self.add_gcode("response", time.time(), out.stdout)
+        elif cmd.find("wifi") == 0:
+            out = subprocess.run(['/home/mks/KlipperScreen/all/run_cmd.sh', 'cp', '/media/usb1/wpa_supplicant-wlan0.conf','/etc/wpa_supplicant/'], stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 universal_newlines=True  # Python >= 3.7 also accepts "text=True"
+                                 )
+            self.add_gcode("response", time.time(), out.stdout)
         elif cmd.find("sh ") ==0:
 
             logging.debug(cmd[3:].split(' '))
@@ -237,6 +244,14 @@ class Panel(ScreenPanel):
                                  )
             logging.debug(out.stdout)
             self.add_gcode("response", time.time(), out.stdout)
+        elif cmd.find("plr") == 0:
+            os.system("sed -i '1 i [include plr.cfg]' /home/mks/printer_data/config/printer.cfg")
+            self.add_gcode("response", time.time(), 'add plr.cfg success')
+            self.add_gcode("response", time.time(), 'please restart the klipper')
+        elif cmd.find("dplr") == 0:
+            os.system("sed -i '/plr.cfg/d' /home/mks/printer_data/config/printer.cfg")
+            self.add_gcode("response", time.time(), 'delete plr.cfg success')
+            self.add_gcode("response", time.time(), 'please restart the klipper')
         else:
             self._screen._ws.klippy.gcode_script(cmd)
         out = subprocess.run(['sync'],
@@ -245,6 +260,7 @@ class Panel(ScreenPanel):
                              universal_newlines=True  # Python >= 3.7 also accepts "text=True"
                              )
         self.add_gcode("response", time.time(), out.stdout)
+        os.system("sync")
     def activate(self):
         self.clear()
         self._screen._ws.send_method("server.gcode_store", {"count": 100}, self.gcode_response)

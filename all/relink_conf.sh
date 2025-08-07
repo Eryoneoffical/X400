@@ -74,6 +74,7 @@ echo makerbase | sudo -S cp /home/mks/KlipperScreen/all/rc.local /etc/rc.local
 sync
 chmod 777 /home/mks/KlipperScreen/* -Rf
 chmod 777 /home/mks/KlipperScreen/all/*.sh
+chmod 777 /home/mks/printer_data/config/*
 /home/mks/KlipperScreen/all/check_hw_version.sh
 curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=needreboot%20VALUE=1
 #curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=use_ai%20VALUE=1

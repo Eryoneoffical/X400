@@ -46,8 +46,8 @@ class HeaterCheck:
             reactor.update_timer(self.check_timer, reactor.NEVER)
     def check_event(self, eventtime):
         temp, target = self.heater.get_temp(eventtime)
-        if "chamber_heater" in self.heater_name and self.error:
-            self.printer.lookup_object('gcode').respond_info("%.2f C：%.2f" % (temp,self.error))
+        #if "chamber_heater" in self.heater_name and self.error:
+        #    self.printer.lookup_object('gcode').respond_info("%.2f C：%.2f" % (temp,self.error))
         if temp >= target - self.hysteresis or target <= 0.:
             # Temperature near target - reset checks
             if self.approaching_target and target:

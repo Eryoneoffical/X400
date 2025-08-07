@@ -18,4 +18,5 @@ sed -i 's/needreboot =1/needreboot = 0/g' /home/mks/printer_data/config/variable
 sed -i 's/needreboot=1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
 sed -i 's/needreboot= 1/needreboot = 0/g' /home/mks/printer_data/config/variable.cfg
 #    curl -X POST http://127.0.0.1/printer/gcode/script?script=SAVE_VARIABLE%20VARIABLE=needreboot%20VALUE=0
+echo makerbase | sudo -S ifconfig can0 txqueuelen 1024
 exit 0

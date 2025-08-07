@@ -11,7 +11,7 @@ There are 3 ways to update and don't forget to reboot the printer after that:
 ```
 cd ~
 mv KlipperScreen KlipperScreen_bk
-git clone https://github.com/Eryoneoffical/x400.git
+git clone https://gitee.com/everyone3d/KlipperScreen
 ~/KlipperScreen/all/git_pull.sh
 
 ```
@@ -34,6 +34,7 @@ go to https://eryone.club , then send `Update Software` command in the console p
 
 ### orca slicer
 It is recommended that you use this OrcaSlicer, which has been configured for the X400.
+https://ln5.sync.com/4.0/dl/2515edb40#fykktwzu-v5tzvm7v-a7s3fay8-5wssn4u6
 https://drive.google.com/drive/folders/1htD4KUY9WmH9W7UyBleRF0uzNoNothT1?usp=drive_link
 
 ### Software of Farm3D 
